@@ -1,8 +1,9 @@
-from __future__ import print_function
-from __future__ import division
+from __future__ import division, print_function
 
 import platform
+
 import numpy as np
+
 import config
 
 # ESP8266 uses WiFi communication
@@ -17,9 +18,11 @@ elif config.DEVICE == 'pi':
                                        config.LED_INVERT, config.BRIGHTNESS)
     strip.begin()
 elif config.DEVICE == 'blinkstick':
-    from blinkstick import blinkstick
     import signal
     import sys
+
+    from blinkstick import blinkstick
+
     #Will turn all leds off when invoked.
     def signal_handler(signal, frame):
         all_off = [0]*(config.N_PIXELS*3)
@@ -90,6 +93,9 @@ def _update_pi():
     This function updates the LED strip with new values.
     """
     global pixels, _prev_pixels
+    # G R B order
+    pixels = np.array([pixels[1], pixels[0], pixels[2]])
+
     # Truncate values and cast to integer
     pixels = np.clip(pixels, 0, 255).astype(int)
     # Optional gamma correction
@@ -137,6 +143,8 @@ def _update_blinkstick():
 
 
 def update():
+    global pixels
+
     """Updates the LED strip values"""
     if config.DEVICE == 'esp8266':
         _update_esp8266()
@@ -148,11 +156,17 @@ def update():
         raise ValueError('Invalid device selected')
 
 
+def stop():
+    global pixels
+    pixels *= 0
+    update()
+
 # Execute this file to run a LED strand test
 # If everything is working, you should see a red, green, and blue pixel scroll
 # across the LED strip continously
 if __name__ == '__main__':
     import time
+
     # Turn all pixels off
     pixels *= 0
     pixels[0, 0] = 255  # Set 1st pixel red
