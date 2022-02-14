@@ -30,6 +30,9 @@ def color_wipe(strip, color, wait_ms=50):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('-c', '--clear', action='store_true', help='clear the display on exit')
+    parser.add_argument("-r", default="0", help="R Value of color")
+    parser.add_argument("-g", default="0", help="G Value of color")
+    parser.add_argument("-b", default="0", help="B Value of color")
     args = parser.parse_args()
 
     # Create NeoPixel object with appropriate configuration.
@@ -37,4 +40,4 @@ if __name__ == '__main__':
     # Intialize the library (must be called once before other functions).
     strip.begin()
 
-    color_wipe(strip, Color(0, 0, 0), 10)
+    color_wipe(strip, Color(int(args.g), int(args.r), int(args.b)), 10)

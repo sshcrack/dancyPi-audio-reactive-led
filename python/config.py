@@ -4,9 +4,6 @@ from __future__ import division
 
 import os
 
-HEX_SPECTRUM = "#ffffff"
-SPECTRUM_MODE = "hex" # "hex"
-
 DEVICE = 'pi'
 
 """Device used to control LED strip. Must be 'pi',  'esp8266' or 'blinkstick'
@@ -47,8 +44,6 @@ if DEVICE == 'blinkstick':
     SOFTWARE_GAMMA_CORRECTION = True
     """Set to True because blinkstick doesn't use hardware dithering"""
 
-USE_GUI = False
-"""Whether or not to display a PyQtGraph GUI plot of visualization"""
 
 DISPLAY_FPS = True
 """Whether to display the FPS when running (can reduce performance)"""
@@ -56,7 +51,7 @@ DISPLAY_FPS = True
 N_PIXELS = 150
 """Number of pixels in the LED strip (must match ESP8266 firmware)"""
 
-GAMMA_TABLE_PATH = os.path.join(os.path.dirname(__file__), 'gamma_table.npy')
+GAMMA_TABLE_PATH = os.path.join(os.path.dirname(__file__), 'visualization', 'gamma_table.npy')
 """Location of the gamma correction table"""
 
 MIC_RATE = 48000

@@ -36,6 +36,8 @@ def measureThread():
             ledUpdate()
 
         time.sleep(.1)
+
+    GPIO.cleanup()
     print("Exiting thread...")
 
 def isEnabled():

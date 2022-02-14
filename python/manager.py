@@ -1,49 +1,63 @@
-import sys
+from led.filters import applyFilters
 
 import gesture.measure as gesture
 import httpserver.server as server
-import led
-import microphone
-import visualization
-from httpserver.currVars import getMode
+import led.led as led
+import visualization.microphone as microphone
+import httpserver.currVars as currVars
+import visualization.visualization as visualization
+from modes import modes, modeKeys
 
 print("Initizalizing Microphone...")
 microphone.start()
 
-print("Initializing...")
+print("Initializing HTTP server...")
 server.start()
 
+print("Loading config...")
+currVars.load()
 led.update()
-
-visualizers = {
-    "scroll": visualization.visualize_scroll,
-    "spectrum": visualization.visualize_spectrum,
-    "energy": visualization.visualize_energy
-}
-visualizer_keys = visualizers.keys()
 
 def main():
     while True:
-        mode = getMode()
-
+        mode = currVars.getMode()
         if not gesture.isEnabled():
             led.pixels *= 0
             led.update()
+            continue
 
-        if mode in visualizer_keys:
-            val = microphone.read()
-            if len(val) != 0:
-                led.pixels = visualizers[mode](val)
-            else:
-                led.pixels *= 0
-            
-            led.update()
+        if not mode in modeKeys:
+            continue
+
+        currMode = modes[mode]
+        isVisualizer = currMode["visualizer"] or False
+        useFilters = currMode["filters"] or False
+        func = currMode["func"]
+
+        funcOut = None
+        micRunning = microphone.isRunning()
+        if isVisualizer and not micRunning:
+            microphone.start()
+
+        if not isVisualizer and micRunning:
+            microphone.stop()
+        
+        if isVisualizer:
+            raw = microphone.read()
+            mel = visualization.microphone_update(raw)
+            funcOut = func(mel)
+        else:
+            funcOut = func()
+
+        if useFilters:
+            funcOut = applyFilters(funcOut);
+
+        led.pixels = funcOut
+        led.update()
 
 try:
     main()
-except Exception as err:
-    print(f"Error {err}")
-
+finally:
     print("Stopping microphone")
     microphone.stop()
 
@@ -52,4 +66,6 @@ except Exception as err:
 
     print("Stopping led")
     led.stop()
-    raise(err)
+
+    print("Saving config")
+    currVars.save()

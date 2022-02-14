@@ -5,8 +5,8 @@ import config
 
 
 frames_per_buffer = int(config.MIC_RATE / config.FPS)
-stream = None
-p = None
+stream: pyaudio.Stream = None
+p: pyaudio.PyAudio = None
 
 overflows = 0
 prev_ovf_time = time.time()
@@ -57,3 +57,7 @@ def stop():
 
     stream = None
     p = None
+
+def isRunning():
+    global stream
+    return stream != None

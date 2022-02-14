@@ -1,7 +1,10 @@
 from http.server import HTTPServer, BaseHTTPRequestHandler
 import json
 from threading import Thread
-from httpserver.setmode import onSetMode
+from urllib.parse import parse_qs, urlparse
+from httpserver.routes.setmode import onSetMode
+from httpserver.routes.filter import onFilter
+from httpserver.routes.setspeed import onSetSpeed
 
 def run_server():
     run(addr="0.0.0.0", port=6789)
@@ -15,11 +18,19 @@ class Server(BaseHTTPRequestHandler):
     def do_GET(self):
         res = { "error": "Path not found" }
         status = 404
-        if self.path.startswith("/setmode"):
-            setRes = onSetMode(self)
 
-            status = setRes[0]
-            res = setRes[1]
+        parsed = urlparse(self.path)
+        params = parse_qs(parsed.query)
+    
+        if self.path.startswith("/setmode"):
+            status, res = onSetMode(self, params)
+
+        if self.path.startswith("/speed"):
+            status, res = onSetSpeed(self, params)
+
+
+        if self.path.startswith("/filter"):
+            status, res = onFilter(self, params)
 
         self.send_response(status)
         self._set_headers()

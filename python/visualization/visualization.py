@@ -8,8 +8,9 @@ import numpy as np
 from scipy.ndimage.filters import gaussian_filter1d
 
 import config
-import dsp
-import tools
+import visualization.dsp as dsp
+from httpserver.currVars import getGeneralSpeed, getFilterMode
+import led.tools as tools
 
 rgb_index = 0
 
@@ -107,16 +108,16 @@ gain = dsp.ExpFilter(np.tile(0.01, config.N_FFT_BINS),
                      alpha_decay=0.001, alpha_rise=0.99)
 
 
-def visualize_scroll(y):
+def visualize_scroll(mel):
     """Effect that originates in the center and scrolls outwards"""
     global p
-    y = y**2.0
-    gain.update(y)
-    y /= gain.value
-    y *= 255.0
-    r = int(np.max(y[:len(y) // 3]))
-    g = int(np.max(y[len(y) // 3: 2 * len(y) // 3]))
-    b = int(np.max(y[2 * len(y) // 3:]))
+    mel = mel**2.0
+    gain.update(mel)
+    mel /= gain.value
+    mel *= 255.0
+    r = int(np.max(mel[:len(mel) // 3]))
+    g = int(np.max(mel[len(mel) // 3: 2 * len(mel) // 3]))
+    b = int(np.max(mel[2 * len(mel) // 3:]))
     # Scrolling effect window
     p[:, 1:] = p[:, :-1]
     p *= 0.98
@@ -129,19 +130,19 @@ def visualize_scroll(y):
     return np.concatenate((p[:, ::-1], p), axis=1)
 
 
-def visualize_energy(y):
+def visualize_energy(mel):
     """Effect that expands from the center with increasing sound energy"""
     global p
-    y = np.copy(y)
-    gain.update(y)
-    y /= gain.value
+    mel = np.copy(mel)
+    gain.update(mel)
+    mel /= gain.value
     # Scale by the width of the LED strip
-    y *= float((config.N_PIXELS // 2) - 1)
+    mel *= float((config.N_PIXELS // 2) - 1)
     # Map color channels according to energy in the different freq bands
     scale = 0.9
-    r = int(np.mean(y[:len(y) // 3]**scale))
-    g = int(np.mean(y[len(y) // 3: 2 * len(y) // 3]**scale))
-    b = int(np.mean(y[2 * len(y) // 3:]**scale))
+    r = int(np.mean(mel[:len(mel) // 3]**scale))
+    g = int(np.mean(mel[len(mel) // 3: 2 * len(mel) // 3]**scale))
+    b = int(np.mean(mel[2 * len(mel) // 3:]**scale))
     # Assign color to different frequency regions
     p[0, :r] = 255.0
     p[0, r:] = 0.0
@@ -162,41 +163,21 @@ def visualize_energy(y):
 _prev_spectrum = np.tile(0.01, config.N_PIXELS // 2)
 
 
-def visualize_spectrum(y):
+def visualize_spectrum(mel):
     """Effect that maps the Mel filterbank frequencies onto the LED strip"""
     global _prev_spectrum, rgb_index, _time_prev
-    y = np.copy(interpolate(y, config.N_PIXELS // 2))
-    common_mode.update(y)
-    diff = y - _prev_spectrum
-    _prev_spectrum = np.copy(y)
+    mel = np.copy(interpolate(mel, config.N_PIXELS // 2))
+    common_mode.update(mel)
+    diff = mel - _prev_spectrum
+    _prev_spectrum = np.copy(mel)
     # Color channel mappings
-    r = r_filt.update(y - common_mode.value)
+    r = r_filt.update(mel - common_mode.value)
     g = np.abs(diff)
-    b = b_filt.update(np.copy(y))
+    b = b_filt.update(np.copy(mel))
     # Mirror the color channels for symmetric output
     r = np.concatenate((r[::-1], r))
     g = np.concatenate((g[::-1], g))
     b = np.concatenate((b[::-1], b))
-
-    desired_rgb = np.array(tools.hex_to_rgb(config.HEX_SPECTRUM)) / 255
-
-    for i in range(len(r)):
-        maxVal = np.amax(np.array([r[i], g[i], b[i]]))
-        if config.SPECTRUM_MODE == "hex":
-            r[i] = maxVal * desired_rgb[0]
-            g[i] = maxVal * desired_rgb[1]
-            b[i] = maxVal * desired_rgb[2]
-
-        if config.SPECTRUM_MODE == "rainbow":
-            rgb_index += ((time.time() * 1000) - _time_prev) * .0005
-            values = np.array(tools.wheel(int(rgb_index + i))) / 255
-
-            if rgb_index >= 255:
-                rgb_index = 0
-
-            r[i] = values[0] * maxVal
-            g[i] = values[1] * maxVal
-            b[i] = values[2] * maxVal
 
     output = np.array([r, g, b]) * 255
     return output
@@ -248,8 +229,15 @@ def microphone_update(audio_samples):
     mel /= mel_gain.value
     mel = mel_smoothing.update(mel)
 
+    fps = frames_per_second()
+    if config.DISPLAY_FPS:
+        if time.time() - 0.5 > prev_fps_update:
+            prev_fps_update = time.time()
+            print('FPS {:.0f} / {:.0f}'.format(fps, config.FPS))
+
     # Returning mel for later processing
     return mel
+
 
 # Number of audio samples to read every time frame
 samples_per_frame = int(config.MIC_RATE / config.FPS)
@@ -257,14 +245,13 @@ samples_per_frame = int(config.MIC_RATE / config.FPS)
 # Array containing the rolling audio sample window
 y_roll = np.random.rand(config.N_ROLLING_HISTORY, samples_per_frame) / 1e16
 
-#try:
+# try:
 #    if __name__ == '__main__':
 #        # Initialize LEDs
 #        led.update()
 #        # Start listening to live audio stream
 #        microphone.start_stream(microphone_update)
-#finally:
+# finally:
 #    print("Stopping leds")
 #    microphone.stop()
 #    led.stop()
-
