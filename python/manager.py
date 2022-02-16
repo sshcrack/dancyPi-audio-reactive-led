@@ -1,13 +1,11 @@
-import math
-import config
-
 import hardware.gesture.measure as gesture
 import httpserver.server as server
 import hardware.led.led as led
 import numpy as np
 from data import applyFilters
+from tools.energyspeed import getAvgEnergy
 from tools.timer import setPrevTime
-from tools.tools import getAvgEnergy, getDeltaTime
+from tools.tools import getDeltaTime
 import modes.visualization.microphone as microphone
 import httpserver.currVars as currVars
 import modes.visualization.visualization as visualization
