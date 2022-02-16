@@ -53,18 +53,23 @@ def  getCurr():
 def micCheck(isVis: bool):
         micRunning = microphone.isRunning()
         if isVis and not micRunning:
+            print("Starting micrphone")
             microphone.start()
 
         if not isVis and micRunning:
+            print("Stopping microphone")
             microphone.stop()
 
 def main():
-    i = 0
     curr_speed = 2500
+    i = 0
 
     isVisualizer, useFilters, func = getCurr()
-    isEnergySpeed = currVars.getConfig("energyspeed")
-    micCheck(isVisualizer or isEnergySpeed)
+    isEnergySpeed = currVars.getConfig("energy_speed")
+    isEnergyBrightness = currVars.getConfig("energy_brightness")
+    energySensitivity = currVars.getConfig("energy_sensitivity")
+
+    micCheck(isVisualizer or isEnergyBrightness or isEnergySpeed)
 
     currEnabled = 1.0
     multiplier = currVars.getMultiplier()
@@ -80,22 +85,23 @@ def main():
             continue
         if i > 50:
             isVisualizer, useFilters, func = getCurr()
-            isEnergySpeed = currVars.getConfig("energyspeed")
-            micCheck(isVisualizer or isEnergySpeed)
+            isEnergySpeed = currVars.getConfig("energy_speed")
+            isEnergyBrightness = currVars.getConfig("energy_brightness")
+            micCheck(isVisualizer or isEnergyBrightness or isEnergySpeed)
             multiplier = currVars.getMultiplier()
             i = 0
 
         funcOut = None
         energy = None
-        if isVisualizer or isEnergySpeed:
+        if isVisualizer or isEnergyBrightness or isEnergySpeed:
             raw = microphone.read()
             mel = visualization.microphone_update(raw)
             if isVisualizer:
                 funcOut = func(mel)
                 setPrevTime()
             else:
-                energy = getAvgEnergy(mel)
-                currVars.setConfig("energyspeed_multiplier", energy)
+                energy = getAvgEnergy(mel) * energySensitivity
+                currVars.setConfig("energy_multiplier", energy)
 
         if not isVisualizer:
             funcOut = func()
@@ -103,7 +109,7 @@ def main():
 
         if useFilters:
             funcOut = applyFilters(funcOut)
-            if energy != None:
+            if energy != None and isEnergyBrightness:
                 funcOut = multipleIntArr(funcOut, energy)
 
 

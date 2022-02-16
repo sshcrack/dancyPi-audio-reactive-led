@@ -2,7 +2,7 @@ from http.server import HTTPServer, BaseHTTPRequestHandler
 import json
 from threading import Thread
 from urllib.parse import parse_qs, urlparse
-from httpserver.routes.energyspeed import onEnergySpeed
+from httpserver.routes.energy import onEnergySpeed
 from httpserver.routes.multiplier import onMultiplier
 from httpserver.routes.setmode import onSetMode
 from httpserver.routes.filter import onFilter

@@ -15,22 +15,26 @@ data = {
         [0, [0, 0, 0]],
         [1, [255, 255, 255]]
     ],
-    "energyspeed": False,
-    "energyspeed_multiplier": 1
+    "energy_brightness": False,
+    "energy_speed": False,
+    "energy_multiplier": 1,
+    "energy_sensitivity": 1
 }
 
 
 def load():
     global data
-    f = open("vars.json", "r")
-    raw = f.read()
 
+    f = None
     try:
+        f = open("vars.json", "r")
+        raw = f.read()
         data = json.loads(raw)
-    except json.JSONDecodeError:
-        print("Could not parse json file. Going to default.")
+    except (json.JSONDecodeError, FileNotFoundError):
+        print("Could not parse json file. Staying with default.")
 
-    f.close()
+    if f != None and not f.closed:
+        f.close()
 
 
 def save():
@@ -67,10 +71,10 @@ def setGeneralSpeed(speed: float):
 
 def getGeneralSpeed():
     global data
-    energy_speed_enabled = data["energyspeed"]
+    energy_speed = data["energy_speed"]
     speed = data["speed"]
-    if energy_speed_enabled:
-        speed *= data["energyspeed_multiplier"]
+    if energy_speed:
+        speed *= data["energy_multiplier"]
 
     return speed
 
