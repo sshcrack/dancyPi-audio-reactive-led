@@ -8,44 +8,7 @@ import numpy as np
 from scipy.ndimage.filters import gaussian_filter1d
 
 import config
-import visualization.dsp as dsp
-from httpserver.currVars import getGeneralSpeed, getFilterMode
-import led.tools as tools
-
-rgb_index = 0
-
-_time_prev = time.time() * 1000.0
-"""The previous time that the frames_per_second() function was called"""
-
-_fps = dsp.ExpFilter(val=config.FPS, alpha_decay=0.2, alpha_rise=0.2)
-"""The low-pass filter used to estimate frames-per-second"""
-
-
-def frames_per_second():
-    """Return the estimated frames per second
-
-    Returns the current estimate for frames-per-second (FPS).
-    FPS is estimated by measured the amount of time that has elapsed since
-    this function was previously called. The FPS estimate is low-pass filtered
-    to reduce noise.
-
-    This function is intended to be called one time for every iteration of
-    the program's main loop.
-
-    Returns
-    -------
-    fps : float
-        Estimated frames-per-second. This value is low-pass filtered
-        to reduce noise.
-    """
-    global _time_prev, _fps
-    time_now = time.time() * 1000.0
-    dt = time_now - _time_prev
-    _time_prev = time_now
-    if dt == 0.0:
-        return _fps.value
-    return _fps.update(1000.0 / dt)
-
+import modes.visualization.dsp as dsp
 
 def memoize(function):
     """Provides a decorator for memoizing functions"""
@@ -228,12 +191,6 @@ def microphone_update(audio_samples):
     mel_gain.update(np.max(gaussian_filter1d(mel, sigma=1.0)))
     mel /= mel_gain.value
     mel = mel_smoothing.update(mel)
-
-    fps = frames_per_second()
-    if config.DISPLAY_FPS:
-        if time.time() - 0.5 > prev_fps_update:
-            prev_fps_update = time.time()
-            print('FPS {:.0f} / {:.0f}'.format(fps, config.FPS))
 
     # Returning mel for later processing
     return mel

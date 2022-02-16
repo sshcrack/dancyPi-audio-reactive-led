@@ -1,9 +1,6 @@
 from __future__ import division, print_function
-
 import platform
-
 import numpy as np
-
 import config
 
 # ESP8266 uses WiFi communication

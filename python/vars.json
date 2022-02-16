@@ -1,0 +1,1 @@
+{"mode": "stack", "filter_mode": "rainbow", "speed": 1.0, "filter_gradient": [[0, [0, 201, 255]], [1, [146, 254, 157]]], "stack_concurrent": 5, "stack_speed": 5.0, "multiplier": 1.0, "scanner_shadow": 10, "scanner_size": 5, "energyspeed": true, "energyspeed_multiplier": 0.02666666666666667}

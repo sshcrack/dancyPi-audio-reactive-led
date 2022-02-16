@@ -1,4 +1,4 @@
-import gesture.grove_gesture_sensor as grove_gesture_sensor
+import hardware.gesture.grove_gesture_sensor as grove_gesture_sensor
 import RPi.GPIO as GPIO
 from threading import Thread
 import time

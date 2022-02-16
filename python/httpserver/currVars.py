@@ -1,4 +1,3 @@
-
 from typing import List
 import json
 
@@ -7,16 +6,23 @@ data = {
     "mode": "spectrum",
     "filter_mode": "hex",
     "speed": 1,
+    "multiplier": 1,
+    "stack_concurrent": 1,
+    "stack_speed": 1,
+    "scanner_size": 10,
+    "scanner_shadow": 2,
     "filter_gradient": [
         [0, [0, 0, 0]],
         [1, [255, 255, 255]]
-    ]
+    ],
+    "energyspeed": False,
+    "energyspeed_multiplier": 1
 }
 
 
 def load():
     global data
-    f = open("config.json", "r")
+    f = open("vars.json", "r")
     raw = f.read()
 
     try:
@@ -29,15 +35,15 @@ def load():
 
 def save():
     global data
-    f = open("config.json", "w")
+    f = open("vars.json", "w")
     f.write(json.dumps(data))
 
     f.close()
 
 
-def setFilterMode(new_mode: str):
+def setFilterMode(filter_mode: str):
     global data
-    data["filter_mode"] = new_mode
+    data["filter_mode"] = filter_mode
 
 
 def getFilterMode():
@@ -45,9 +51,9 @@ def getFilterMode():
     return data["filter_mode"]
 
 
-def setMode(new_mode: str):
+def setMode(mode: str):
     global data
-    data["mode"] = new_mode
+    data["mode"] = mode
 
 
 def getMode():
@@ -55,21 +61,48 @@ def getMode():
     return data["mode"]
 
 
-def setGeneralSpeed(new_speed: float):
+def setGeneralSpeed(speed: float):
     global data
-    data["speed"] = new_speed
-
+    data["speed"] = speed
 
 def getGeneralSpeed():
     global data
-    return data["speed"]
+    energy_speed_enabled = data["energyspeed"]
+    speed = data["speed"]
+    if energy_speed_enabled:
+        speed *= data["energyspeed_multiplier"]
 
+    return speed
 
-def setGradient(new_gradient: List[List]):
+def setSpeedMultiplier(mult: float):
     global data
-    data["filter_gradient"] = new_gradient
+    data["energyspeed_multiplier"] = mult
+
+def setMultiplier(multiplier: float):
+    global data
+    data["multiplier"] = multiplier
+
+
+def getMultiplier():
+    global data
+    return data["multiplier"]
+
+
+
+def setGradient(gradient: List[List]):
+    global data
+    data["filter_gradient"] = gradient
 
 
 def getGradient():
     global data
     return data["filter_gradient"]
+
+def getConfig(key: str):
+    global data
+    return data.get(key)
+
+    
+def setConfig(key: str, val):
+    global data
+    data[key] = val

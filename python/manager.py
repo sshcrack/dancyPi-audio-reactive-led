@@ -1,12 +1,17 @@
-from led.filters import applyFilters
+import math
+import config
 
-import gesture.measure as gesture
+import hardware.gesture.measure as gesture
 import httpserver.server as server
-import led.led as led
-import visualization.microphone as microphone
+import hardware.led.led as led
+import numpy as np
+from data import applyFilters
+from tools.timer import setPrevTime
+from tools.tools import getAvgEnergy, getDeltaTime
+import modes.visualization.microphone as microphone
 import httpserver.currVars as currVars
-import visualization.visualization as visualization
-from modes import modes, modeKeys
+import modes.visualization.visualization as visualization
+from data import modes, modeKeys
 
 print("Initizalizing Microphone...")
 microphone.start()
@@ -18,42 +23,104 @@ print("Loading config...")
 currVars.load()
 led.update()
 
-def main():
-    while True:
-        mode = currVars.getMode()
-        if not gesture.isEnabled():
-            led.pixels *= 0
-            led.update()
-            continue
 
-        if not mode in modeKeys:
-            continue
+def multipleIntArr(arr, numb, maxInt = 255, minInt = 0):
+    newArr = []
+    for i in range(len(arr)):
+        channel = arr[i]
+        temp = []
+        for x in range(len(channel)):
+            maxMin = min(max(round(channel[x] * numb), minInt), maxInt)
+            temp.append(maxMin)
+        newArr.append(temp)
+    
+    return np.array(newArr)
 
-        currMode = modes[mode]
-        isVisualizer = currMode["visualizer"] or False
-        useFilters = currMode["filters"] or False
-        func = currMode["func"]
+def  getCurr():
+    mode = currVars.getMode()
+    
+    if not mode in modeKeys:
+        return [ None, None, None]
 
-        funcOut = None
+
+    currMode = modes[mode]
+    isVisualizer = currMode["visualizer"] or False
+    useFilters = currMode["filters"] or False
+    func = currMode["func"]
+
+    return [ isVisualizer, useFilters, func ]
+
+def micCheck(isVis: bool):
         micRunning = microphone.isRunning()
-        if isVisualizer and not micRunning:
+        if isVis and not micRunning:
             microphone.start()
 
-        if not isVisualizer and micRunning:
+        if not isVis and micRunning:
             microphone.stop()
+
+def main():
+    i = 0
+    curr_speed = 2500
+
+    isVisualizer, useFilters, func = getCurr()
+    isEnergySpeed = currVars.getConfig("energyspeed")
+    micCheck(isVisualizer or isEnergySpeed)
+
+    currEnabled = 1.0
+    multiplier = currVars.getMultiplier()
+    setPrevTime()
+    while True:
+        enabled = gesture.isEnabled()
         
-        if isVisualizer:
+        if not enabled and currEnabled == 0:
+            led.pixels *= 0
+            led.update()
+
+            setPrevTime()
+            continue
+        if i > 50:
+            isVisualizer, useFilters, func = getCurr()
+            isEnergySpeed = currVars.getConfig("energyspeed")
+            micCheck(isVisualizer or isEnergySpeed)
+            multiplier = currVars.getMultiplier()
+            i = 0
+
+        funcOut = None
+        energy = None
+        if isVisualizer or isEnergySpeed:
             raw = microphone.read()
             mel = visualization.microphone_update(raw)
-            funcOut = func(mel)
-        else:
+            if isVisualizer:
+                funcOut = func(mel)
+                setPrevTime()
+            else:
+                energy = getAvgEnergy(mel)
+                currVars.setConfig("energyspeed_multiplier", energy)
+
+        if not isVisualizer:
             funcOut = func()
+            setPrevTime()
 
         if useFilters:
-            funcOut = applyFilters(funcOut);
+            funcOut = applyFilters(funcOut)
+            if energy != None:
+                funcOut = multipleIntArr(funcOut, energy)
+
+
+        delta = getDeltaTime()
+        if enabled and currEnabled < 1:
+            funcOut = multipleIntArr(funcOut, currEnabled)
+            currEnabled =  min(currEnabled + delta * curr_speed, 1)
+        elif not enabled and currEnabled > 0:
+            funcOut = multipleIntArr(funcOut, currEnabled)
+            currEnabled = max(0, currEnabled - delta * curr_speed)
+        else:
+            if multiplier != 1:
+                funcOut *= multipleIntArr(funcOut, multiplier)
 
         led.pixels = funcOut
         led.update()
+        i += 1
 
 try:
     main()

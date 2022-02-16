@@ -1,14 +1,13 @@
 from http.server import BaseHTTPRequestHandler
 import json
 from typing import Any, List
-import led.tools as tools
+from tools import tools
+import data
 import re
 
 from httpserver.currVars import setFilterMode, setGradient
 
-availableModes = ["hex", "normal", "rainbow"]
-
-
+availableModes = list(data.filters.keys())
 def isNotNumber(s: Any):
     return not str(s).isnumeric()
 
@@ -37,7 +36,6 @@ def onFilter(_server: BaseHTTPRequestHandler, params: List[str]):
                     "mode": mode
                 })
 
-    setFilterMode(mode)
     if mode == "hex":
         if gradient == None or len(gradient) == 0:
             return (400,
@@ -81,6 +79,7 @@ def onFilter(_server: BaseHTTPRequestHandler, params: List[str]):
 
         print(f"Gradient data set to {gradient_data}")
         setGradient(gradient_data)
+    setFilterMode(mode)
 
     return (200, {
         "success": True,

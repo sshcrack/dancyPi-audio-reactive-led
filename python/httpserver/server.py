@@ -2,6 +2,8 @@ from http.server import HTTPServer, BaseHTTPRequestHandler
 import json
 from threading import Thread
 from urllib.parse import parse_qs, urlparse
+from httpserver.routes.energyspeed import onEnergySpeed
+from httpserver.routes.multiplier import onMultiplier
 from httpserver.routes.setmode import onSetMode
 from httpserver.routes.filter import onFilter
 from httpserver.routes.setspeed import onSetSpeed
@@ -31,6 +33,13 @@ class Server(BaseHTTPRequestHandler):
 
         if self.path.startswith("/filter"):
             status, res = onFilter(self, params)
+
+        if self.path.startswith("/multiplier"):
+            status, res = onMultiplier(self, params)
+            
+        if self.path.startswith("/energyspeed"):
+            status, res = onEnergySpeed(self, params)
+
 
         self.send_response(status)
         self._set_headers()

@@ -51,7 +51,7 @@ DISPLAY_FPS = True
 N_PIXELS = 150
 """Number of pixels in the LED strip (must match ESP8266 firmware)"""
 
-GAMMA_TABLE_PATH = os.path.join(os.path.dirname(__file__), 'visualization', 'gamma_table.npy')
+GAMMA_TABLE_PATH = os.path.join(os.path.dirname(__file__), 'modes', 'visualization', 'gamma_table.npy')
 """Location of the gamma correction table"""
 
 MIC_RATE = 48000

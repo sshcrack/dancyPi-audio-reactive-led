@@ -1,7 +1,7 @@
 from __future__ import print_function
 import numpy as np
 import config
-import visualization.melbank as melbank
+import modes.visualization.melbank as melbank
 
 
 class ExpFilter:
