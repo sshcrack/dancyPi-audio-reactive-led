@@ -1,0 +1,17 @@
+.generalBox {
+    width: 75%;
+}
+
+.selector {
+    width: 20% !important;
+}
+
+@media screen and (max-width: 768px) {
+    .generalBox {
+        width: 90%;
+    }
+
+    .selector {
+        width: 50% !important;
+    }
+}
