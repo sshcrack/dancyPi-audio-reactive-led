@@ -10,7 +10,7 @@ from tools.validators import validate_float, validate_int
 from httpserver.currVars import getFilterMode
 
 
-required_parsable = [ "min", "max", "type" ]
+required_parsable = [ "min", "max", "type", "sug_min", "sug_max" ]
 
 #! Make sure that requried vars are prefixed with root key (REQUIRED)
 modes = {
@@ -44,11 +44,16 @@ modes = {
         "filters": True,
         "required_vars": {
             "stack_concurrent": {
+                "sug_max": 30,
+                "sug_min": 1,
                 "func": validate_int("concurrent", 1),
                 "type": "int",
                 "min": 1
             },
             "stack_speed": {
+                "sug_max": 15,
+                "sug_min": 0,
+                "min": 0,
                 "func": validate_float("speed"),
                 "type": "float"
             }
@@ -60,6 +65,8 @@ modes = {
         "filters": True,
         "required_vars": {
             "scanner_shadow": {
+                "sug_min": 0,
+                "sug_max": 100,
                 "func": validate_int("shadow", 0),
                 "type": "int",
                 "min": 0
@@ -67,6 +74,8 @@ modes = {
             "scanner_size": {
                 "func": validate_int("size", 1),
                 "type": "int",
+                "sug_min": 1,
+                "sug_max": 30,
                 "min": 1
             }
         }
@@ -93,7 +102,9 @@ filters = {
         "required_vars": {
             "rainbow_speed": {
                 "func": validate_float("speed"),
-                "type": "float"
+                "type": "float",
+                "sug_min": 0,
+                "sug_max": 15
             }
         }
     },
