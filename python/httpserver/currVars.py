@@ -16,9 +16,12 @@ data = {
         [1, [255, 255, 255]]
     ],
     "energy_brightness": False,
+    "energy_brightness_mult": 1,
     "energy_speed": False,
-    "energy_multiplier": 1,
-    "energy_sensitivity": 1
+    "energy_speed_mult": 1,
+    "energy_curr": 1,
+    "energy_sensitivity": 1,
+    "rainbow_speed": 1
 }
 
 
@@ -74,7 +77,7 @@ def getGeneralSpeed():
     energy_speed = data["energy_speed"]
     speed = data["speed"]
     if energy_speed:
-        speed *= data["energy_multiplier"]
+        speed *= data["energy_curr"] * data["energy_speed_mult"]
 
     return speed
 
@@ -110,3 +113,7 @@ def getConfig(key: str):
 def setConfig(key: str, val):
     global data
     data[key] = val
+
+def getAllVars():
+    global data
+    return data

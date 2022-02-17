@@ -1,4 +1,5 @@
-from httpserver.currVars import getGeneralSpeed
+from typing import List
+from httpserver.currVars import getConfig, getGeneralSpeed
 import numpy as np
 import tools.tools as tools
 
@@ -7,7 +8,10 @@ def rainbow(data):
     global _time_prev, rgb_index
 
     r, g, b = data
-    speed = getGeneralSpeed()
+    speed = getConfig("rainbow_speed")
+    if speed == None:
+        speed = getGeneralSpeed()
+
     deltaTime = tools.getDeltaTime()
 
 

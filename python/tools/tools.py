@@ -1,5 +1,6 @@
 from time import time
 from typing import Optional
+import re
 
 from tools.timer import getPrevTime
 
@@ -45,6 +46,21 @@ def check_float(potential_float):
         float(potential_float)
         return True
     except ValueError:
-
+        return False
+    except TypeError:
         return False
 
+        
+        
+def check_int(potential_int):
+    try:
+        int(potential_int)
+        return True
+    except ValueError:
+        return False
+    except TypeError:
+        return False
+
+
+def isColorHex(s: str):
+    return re.search(r'^#(?:[0-9a-fA-F]{3}){1,2}$', str(s))

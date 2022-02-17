@@ -3,7 +3,7 @@ from math import ceil, floor
 import config
 import numpy as np
 from httpserver.currVars import getConfig, getGeneralSpeed
-from tools.tools import getDeltaTime
+from tools.tools import check_int, check_float, getDeltaTime
 
 curr_stack = 0
 pixel_locations = []

@@ -2,11 +2,13 @@ from http.server import HTTPServer, BaseHTTPRequestHandler
 import json
 from threading import Thread
 from urllib.parse import parse_qs, urlparse
+from httpserver.routes.available import onAvailable
 from httpserver.routes.energy import onEnergySpeed
 from httpserver.routes.multiplier import onMultiplier
 from httpserver.routes.setmode import onSetMode
 from httpserver.routes.filter import onFilter
 from httpserver.routes.setspeed import onSetSpeed
+from httpserver.routes.vars import onVars
 
 def run_server():
     run(addr="0.0.0.0", port=6789)
@@ -40,6 +42,11 @@ class Server(BaseHTTPRequestHandler):
         if self.path.startswith("/energyspeed"):
             status, res = onEnergySpeed(self, params)
 
+        if self.path.startswith("/vars"):
+            status, res = onVars(self, params)
+
+        if self.path.startswith("/available"):
+            status, res = onAvailable(self, params)
 
         self.send_response(status)
         self._set_headers()

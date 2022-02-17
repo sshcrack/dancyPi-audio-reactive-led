@@ -65,6 +65,7 @@ def main():
     isVisualizer, useFilters, func = getCurr()
     isEnergySpeed = currVars.getConfig("energy_speed")
     isEnergyBrightness = currVars.getConfig("energy_brightness")
+    energyBrightnessMult = currVars.getConfig("energy_brightness_mult")
     energySensitivity = currVars.getConfig("energy_sensitivity")
 
     micCheck(isVisualizer or isEnergyBrightness or isEnergySpeed)
@@ -85,6 +86,7 @@ def main():
             isVisualizer, useFilters, func = getCurr()
             isEnergySpeed = currVars.getConfig("energy_speed")
             isEnergyBrightness = currVars.getConfig("energy_brightness")
+            energyBrightnessMult = currVars.getConfig("energy_brightness_mult")
             micCheck(isVisualizer or isEnergyBrightness or isEnergySpeed)
             multiplier = currVars.getMultiplier()
             i = 0
@@ -99,7 +101,7 @@ def main():
                 setPrevTime()
             else:
                 energy = getAvgEnergy(mel) * energySensitivity
-                currVars.setConfig("energy_multiplier", energy)
+                currVars.setConfig("energy_curr", energy)
 
         if not isVisualizer:
             funcOut = func()
@@ -108,7 +110,7 @@ def main():
         if useFilters:
             funcOut = applyFilters(funcOut)
             if energy != None and isEnergyBrightness:
-                funcOut = multipleIntArr(funcOut, energy)
+                funcOut = multipleIntArr(funcOut, energy * energyBrightnessMult)
 
 
         delta = getDeltaTime()

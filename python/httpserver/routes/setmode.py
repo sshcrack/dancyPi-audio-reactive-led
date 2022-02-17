@@ -1,109 +1,52 @@
 from typing import List
 from http.server import BaseHTTPRequestHandler
-from data import modeKeys
+from data import modeKeys, modes
 
 from httpserver.currVars import setConfig, setMode
-from tools.tools import check_float, isInt
 
 def onSetMode(server: BaseHTTPRequestHandler, params: List[str]):
-    mode = params.get("mode")
-    concurrent = params.get("concurrent")
-    speed = params.get("speed")
+    mode_str = params.get("mode")
 
-    shadow = params.get("shadow")
-    size = params.get("size")
+    if mode_str != None and len(mode_str) != 0:
+        mode_str = mode_str[0]
 
-    if mode != None and len(mode) != 0:
-        mode = mode[0]
-
-
-    if concurrent != None and len(concurrent) != 0:
-        concurrent = concurrent[0]
-
-        
-    if speed != None and len(speed) != 0:
-        speed = speed[0]
-
-
-    if shadow != None and len(shadow) != 0:
-        shadow = shadow[0]
-
-        
-    if size != None and len(size) != 0:
-        size = size[0]
-
-
-    if mode not in modeKeys:
+    if mode_str not in modeKeys:
         return (400,
                 {
-                    "error": f"Invalid mode valid modes are {modeKeys}",
-                    "mode": mode
+                    "error": f"Invalid mode valid modes are {modeKeys}"
                 })
 
-    if mode == "stack" :
-        if concurrent == None or not isInt(concurrent):
-            return (400,
-                    {
-                        "error": f"Invalid integer for concurrent {concurrent}",
-                        "mode": mode
-                    })
+    mode = modes[mode_str]
+    required_vars = mode["required_vars"]
+    
+    if type(required_vars) is dict:
+        usual_prefix = f"{mode_str}_"
 
-        concurrent_int = int(concurrent)
-        if concurrent_int <= 0:
-            return (400,
-                    {
-                        "error": f"Invalid integer for concurrent {concurrent} may no be zero or below",
-                        "mode": mode
-                    })
+        for key in required_vars.keys():
+            param_key = key
+            if key.startswith(usual_prefix):
+                param_key = param_key.replace(usual_prefix, "")
 
+            func = required_vars[key]["func"]
+            res = func(params.get(param_key))
+            res_keys = res.keys()
 
-        if speed == None or not check_float(speed):
-            return (400,
-                    {
-                        "error": f"Invalid float for speed {speed}",
-                        "mode": mode
-                    })
-
-        speed_float = float(speed)
-        setConfig("stack_concurrent", concurrent_int)
-        setConfig("stack_speed", speed_float)
-
-    if mode == "scanner" :
-            if shadow == None or not isInt(shadow):
+            if "error" in res_keys:
                 return (400,
-                        {
-                            "error": f"Invalid integer for shadow {shadow}"
-                        })
+                {
+                    "error": res["error"]
+                })
 
-            shadow_int = int(shadow)
-            if shadow_int <= 0:
-                return (400,
-                        {
-                            "error": f"Invalid integer for shadow {shadow} may no be zero or below",
-                            "mode": mode
-                        })
+            if "result" not in res_keys:
+                return (500,
+                {
+                    "error": f"Validate function mode {mode_str} with key {key} did not return any value"
+                })
+            
+            setConfig(key, res["result"])
 
-
-            if size == None or not isInt(size):
-                    return (400,
-                            {
-                                "error": f"Invalid integer for size {size}"
-                            })
-
-            size_int = int(size)
-            if size_int <= 0:
-                return (400,
-                        {
-                            "error": f"Invalid integer for size {size} may no be zero or below",
-                            "mode": mode
-                        })
-
-            setConfig("scanner_shadow", shadow_int)
-            setConfig("scanner_size", size_int)
-
-
-    setMode(mode)
+    setMode(mode_str)
     return (200, {
         "success": True,
-        "mode": mode
+        "mode": mode_str
     })

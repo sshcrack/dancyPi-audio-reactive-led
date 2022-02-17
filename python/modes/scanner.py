@@ -47,5 +47,3 @@ def scanner():
         channel.append(brightness)
 
     return np.array([ channel, channel, channel ])
-
-        
