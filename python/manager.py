@@ -116,7 +116,7 @@ def main():
         delta = getDeltaTime()
         if enabled and currEnabled < 1:
             funcOut = multipleIntArr(funcOut, currEnabled)
-            currEnabled =  min(currEnabled + delta * 3, 1)
+            currEnabled =  min(currEnabled + delta * 8, 1)
         elif not enabled and currEnabled > 0:
             funcOut = multipleIntArr(funcOut, currEnabled)
             currEnabled = max(0, currEnabled - delta * 3)
