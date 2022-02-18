@@ -5,6 +5,7 @@ from socketserver import ThreadingMixIn
 from threading import Thread
 from urllib.parse import parse_qs, urlparse
 from httpserver.routes.available import onAvailable
+from httpserver.routes.enabled import onEnabled
 from httpserver.routes.energy import onEnergy
 from httpserver.routes.multiplier import onMultiplier
 from httpserver.routes.setmode import onSetMode
@@ -33,6 +34,9 @@ class Handler(BaseHTTPRequestHandler):
     
         if self.path.startswith("/setmode"):
             status, res = onSetMode(self, params)
+            
+        if self.path.startswith("/enabled"):
+            status, res = onEnabled(self, params)
 
         if self.path.startswith("/speed"):
             status, res = onSetSpeed(self, params)
