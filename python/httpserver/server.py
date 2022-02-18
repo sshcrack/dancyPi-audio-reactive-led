@@ -17,6 +17,7 @@ def run_server():
 class Server(BaseHTTPRequestHandler):
     def _set_headers(self):
         self.send_header("Content-Type", "application/json")
+        self.send_header("Access-Control-Allow-Origin", "*")
         self.end_headers()
 
     def do_GET(self):

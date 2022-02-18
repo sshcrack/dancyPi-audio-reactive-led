@@ -4,6 +4,7 @@ This repository, as you can see, has been forked many times before.
 ## NOTE: This is a Repository for RPI ONLY (others haven't been tested)
 
 # Changes
+#### Note: No GUI available currently (implementing it with new modes is just a mess)
 ## Starting
 ```shell
 sudo python3 manager.py
@@ -11,7 +12,7 @@ sudo python3 manager.py
 
 ## HTTP-Server
 ### Listening by default on 6789
-
+### WebGUI should be available at `http://RASPI_IP:6789` (WIP)
 ## Controlling modes
 ### Modes available
 Are chaning where pixels are lighted up
