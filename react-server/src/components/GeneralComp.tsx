@@ -1,8 +1,8 @@
-import { Box, Flex, Heading, Text } from '@chakra-ui/react'
+import { Box, Flex, Text } from '@chakra-ui/react'
+import "../generalComp.css"
 import { General, StoredData } from "./interface"
-import { ComponentTypes, typeComponents } from './types/components'
-import styles from "../styles/generalComp.module.css"
 import { capitalizeWord } from './tools'
+import { ComponentTypes, typeComponents } from './types/components'
 
 export default function GeneralComp({ data: mode, onStoredChange, stored }: CompProps) {
     const { name: outerName, vars } = mode
@@ -26,11 +26,11 @@ export default function GeneralComp({ data: mode, onStoredChange, stored }: Comp
         const curr = stored[loc]
 
         return <>
-            <Flex key={`flex-${loc}`} w='100%' className={styles.comp} justifyContent='center' alignItems='center'>
+            <Flex key={`flex-${loc}`} w='100%' className='comp' justifyContent='center' alignItems='center'>
                 <Flex flex='.4' justifyContent='center' alignItems='center'>
                     <Text>{capitalizeWord(name)}</Text>
                 </Flex>
-                <Box className={styles.compContainer}>
+                <Box className='compContainer'>
                     <Comp variable={e} key={`${loc}-comp`} onChange={onChange} curr={curr} />
                 </Box>
             </Flex>

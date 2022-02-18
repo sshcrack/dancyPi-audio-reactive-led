@@ -1,16 +1,13 @@
 import { Box, Button, Flex, Heading, IconButton, Select, Spinner, useColorMode, useToast } from "@chakra-ui/react"
-import type { NextPage } from 'next'
-import Head from 'next/head'
 import { Dispatch, useCallback, useEffect, useState } from 'react'
-import { FaRaspberryPi } from "react-icons/fa"
-import EnergyComp from '../components/Energy'
-import GeneralComp from '../components/GeneralComp'
-import { AvailableData, General, NormalStorageKeys, StoredData, Var } from '../components/interface'
-import { capitalizeWord } from '../components/tools'
-import { FaRegSun, FaRegMoon } from "react-icons/fa"
-import styles from "../styles/index.module.css"
+import { FaRaspberryPi, FaRegMoon, FaRegSun } from "react-icons/fa"
+import './App.css'
+import EnergyComp from './components/Energy'
+import GeneralComp from './components/GeneralComp'
+import { AvailableData, General, NormalStorageKeys, StoredData, Var } from './components/interface'
+import { capitalizeWord } from './components/tools'
 
-const Home: NextPage = () => {
+function App() {
   const [available, setAvailable] = useState<AvailableData | undefined>(undefined)
   const [stored, setStorage] = useState<StoredData | undefined>(undefined)
   const [ isLoading, setLoading ] = useState(true)
@@ -38,7 +35,7 @@ const Home: NextPage = () => {
 
   useEffect(() => {
     setLoading(true)
-    const base = getBaseUrl(location)
+    const base = getBaseUrl(window.location)
 
     const availableUrl = `${base}/available`
     const varsUrl = `${base}/vars`
@@ -86,14 +83,11 @@ const Home: NextPage = () => {
   const filterSettings = currFilter && stored ? <GeneralComp data={currFilter} stored={stored} onStoredChange={onStoreChange} /> : <Spinner />
   return (
     <>
-      <Head>
-        <title>Control LED Visualizer</title>
-      </Head>
       <Flex justifyContent='center' alignItems='center' flexDirection='column' mt='4'>
         <Flex justifyContent='center' alignItems='center' w='100%'>
           <Flex flex='1' justifyContent='center' alignItems='center'>
             <FaRaspberryPi style={{ width: '4rem', height: '4rem' }} />
-            <Heading className={styles.title}>Raspberry PI Visualizer</Heading>
+            <Heading className='title'>Raspberry PI Visualizer</Heading>
           </Flex>
           <IconButton mr={4} aria-label="Toggle Mode" onClick={toggleColorMode}>
             {colorMode === 'light' ? <FaRegMoon /> : <FaRegSun />}
@@ -104,7 +98,7 @@ const Home: NextPage = () => {
 
         <Heading>Effect</Heading>
         <Box mt='1em' />
-        <Flex className={styles.generalBox} justifyContent='center' alignItems='center' flexDir='column'>
+        <Flex className='generalBox' justifyContent='center' alignItems='center' flexDir='column'>
           {modeSelector}
           {modeSettings}
         </Flex>
@@ -113,7 +107,7 @@ const Home: NextPage = () => {
 
         <Heading>Filter</Heading>
         <Box mt='1em' />
-        <Flex className={styles.generalBox} justifyContent='center' alignItems='center' flexDir='column'>
+        <Flex className='generalBox' justifyContent='center' alignItems='center' flexDir='column'>
           {filterSelector}
           {filterSettings}
         </Flex>
@@ -122,7 +116,7 @@ const Home: NextPage = () => {
         <Heading>General Visualization</Heading>
         <Box mt='1em' />
 
-        <Flex className={styles.generalBox} justifyContent='center' alignItems='center'>
+        <Flex className='generalBox' justifyContent='center' alignItems='center'>
           {
             stored ? <EnergyComp onChange={onStoreChange} stored={stored} /> : <Spinner />
           }
@@ -141,10 +135,11 @@ const Home: NextPage = () => {
   )
 }
 
+
 function getSelector(default_key: string, data: General[] | undefined, storage: StoredData | undefined, onChange: ChangeFunc) {
   const keys = data?.map(e => e.name) ?? []
 
-  return <Box className={styles.selector}>
+  return <Box className='selector'>
     {!data || !storage ?
       <Spinner /> :
       <Select defaultValue={storage[default_key]} onChange={e => {
@@ -207,7 +202,7 @@ async function saveOuter(available: AvailableData | undefined, stored: StoredDat
     })
   }
 
-  const base = getBaseUrl(location);
+  const base = getBaseUrl(window.location);
   const modeQuery = (modeQueries as string[]).join("&")
   const filterQuery = (filterQueries as string[]).join("&")
 
@@ -273,10 +268,11 @@ function getEnergyQuery(stored: StoredData) {
 
 function getBaseUrl(location: Location) {
   const { protocol, host } = location
-  return `${protocol}//${/*host*/"10.6.0.1:6789"}`
+  return `${protocol}//${host}`
 }
 
 type ChangeFunc = (newMode: string) => void
 type Toast = ReturnType<typeof useToast>
 
-export default Home
+
+export default App;
