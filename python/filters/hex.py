@@ -39,7 +39,16 @@ def validateGradient(param: List[str]) -> VerifierResult:
             "result": None
         }
 
+    if len(data) < 1:
+        return {
+            "erorr": "Gradient has to have at least one step",
+            "result": None
+        }
+
     out = []
+    has_one = False
+    has_zero = False
+
     for el in data:
         if type(el) is not list:
             return {
@@ -54,7 +63,7 @@ def validateGradient(param: List[str]) -> VerifierResult:
             }
         
         step, curr_hex = el
-        if type(step) is not float:
+        if type(step) is not float and type(step) is not int:
             return {
                 "error" :"GradientElement[0] has to be a float",
                 "result": None
@@ -78,8 +87,23 @@ def validateGradient(param: List[str]) -> VerifierResult:
                 "result": None
             }
 
+        if step == 0:
+            has_zero = True
+
+        if step == 1:
+            has_one = True
+
         rgb = hex_to_rgb(curr_hex)
         out.append([ step, rgb ])
+
+    if not has_zero:
+        first = out[0][1]
+        out.reverse()
+        out.append([0, first])
+        out.reverse()
+
+    if not has_one:
+        out.append([1, out[-1][1]])
 
     return {
         "result": out

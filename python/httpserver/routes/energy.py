@@ -5,7 +5,7 @@ from httpserver.currVars import setConfig
 from tools.tools import check_float, isInt
 
 
-def onEnergySpeed(_server: BaseHTTPRequestHandler, params: List[str]):
+def onEnergy(_server: BaseHTTPRequestHandler, params: List[str]):
     bright_bool = params.get("brightness")
     speed_bool = params.get("speed")
     sensitivity_str = params.get("sensitivity")

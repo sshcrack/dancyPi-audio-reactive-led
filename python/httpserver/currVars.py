@@ -11,7 +11,7 @@ data = {
     "stack_speed": 1,
     "scanner_size": 10,
     "scanner_shadow": 2,
-    "filter_gradient": [
+    "hex_gradient": [
         [0, [0, 0, 0]],
         [1, [255, 255, 255]]
     ],
@@ -98,12 +98,12 @@ def getMultiplier():
 
 def setGradient(gradient: List[List]):
     global data
-    data["filter_gradient"] = gradient
+    data["hex_gradient"] = gradient
 
 
 def getGradient():
     global data
-    return data["filter_gradient"]
+    return data["hex_gradient"]
 
 def getConfig(key: str):
     global data

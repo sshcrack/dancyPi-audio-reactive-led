@@ -44,6 +44,7 @@ def onSetMode(server: BaseHTTPRequestHandler, params: List[str]):
                 })
             
             setConfig(key, res["result"])
+            print("Setting", key, "to", res["result"])
 
     setMode(mode_str)
     return (200, {
