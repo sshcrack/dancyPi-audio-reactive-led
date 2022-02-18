@@ -5,6 +5,10 @@ This repository, as you can see, has been forked many times before.
 
 # Changes
 #### Note: No GUI available currently (implementing it with new modes is just a mess)
+## Installing
+[Click here.](#install-git--clone-repo)
+Installing is the same as for Naztronaut install
+
 ## Starting
 ```shell
 sudo python3 manager.py
@@ -12,7 +16,14 @@ sudo python3 manager.py
 
 ## HTTP-Server
 ### Listening by default on 6789
-### WebGUI should be available at `http://RASPI_IP:6789` (WIP)
+### WebGUI should be available at `http://RASPI_IP:6789`
+
+------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------
+
+------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------
+# (Obsolete as WebGUI was introduced)
 ## Controlling modes
 ### Modes available
 Are chaning where pixels are lighted up
