@@ -1,19 +1,6 @@
-# See https:nodejs/nodejs/help.github.comnodejs/articlesnodejs/ignoring-filesnodejs/ for more about ignoring files.
-
 # dependencies
-nodejs/node_modules
-nodejs/.pnp
+website/node_modules
 .pnp.js
-
-# testing
-nodejs/coverage
-
-# next.js
-nodejs/.next/
-nodejs/out/
-
-# production
-nodejs/build
 
 # misc
 .DS_Store
