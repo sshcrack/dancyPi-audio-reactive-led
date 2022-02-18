@@ -9,7 +9,7 @@
 /coverage
 
 # production
-/build
+#/build excluding so people dont have to build this website
 
 # misc
 .DS_Store
