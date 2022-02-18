@@ -48,6 +48,7 @@ def onFilter(_server: BaseHTTPRequestHandler, params: List[str]):
                 })
             
             setConfig(key, res["result"])
+            print("Setting", key, "to", res["result"])
     setFilterMode(filter_str)
 
     return (200, {
