@@ -1,5 +1,5 @@
-import { Box, Button, Flex, Heading, IconButton, Select, Spinner, useColorMode, useToast } from "@chakra-ui/react"
-import { Dispatch, useCallback, useEffect, useState } from 'react'
+import { Box, Button, Flex, Heading, IconButton, Select, Spinner, Switch, Text, useColorMode, useToast } from "@chakra-ui/react"
+import { ChangeEvent, Dispatch, useCallback, useEffect, useState } from 'react'
 import { FaRaspberryPi, FaRegMoon, FaRegSun } from "react-icons/fa"
 import './App.css'
 import EnergyComp from './components/Energy'
@@ -10,7 +10,7 @@ import { capitalizeWord } from './components/tools'
 function App() {
   const [available, setAvailable] = useState<AvailableData | undefined>(undefined)
   const [stored, setStorage] = useState<StoredData | undefined>(undefined)
-  const [ isLoading, setLoading ] = useState(true)
+  const [isLoading, setLoading] = useState(true)
   const [update, setUpdate] = useState<number>(0);
   const [isSaving, setSaving] = useState(false);
   const { colorMode, toggleColorMode } = useColorMode()
@@ -24,7 +24,7 @@ function App() {
     setStorage({ ...stored })
   }, [setStorage, stored])
   const save = useCallback(() => {
-    if(!isSaving)
+    if (!isSaving)
       setSaving(true)
     saveOuter(available, stored, toast, isSaving, setSaving)
       .finally(() => {
@@ -81,6 +81,58 @@ function App() {
 
   const modeSettings = currMode && stored ? <GeneralComp data={currMode} stored={stored} onStoredChange={onStoreChange} /> : <Spinner />
   const filterSettings = currFilter && stored ? <GeneralComp data={currFilter} stored={stored} onStoredChange={onStoreChange} /> : <Spinner />
+
+  const content = <>
+    <Heading>Effect</Heading>
+    <Box mt='1em' />
+    <Flex className='generalBox' justifyContent='center' alignItems='center' flexDir='column'>
+      {modeSelector}
+      {modeSettings}
+    </Flex>
+
+    <Box mt='1.5em' />
+
+    <Heading>Filter</Heading>
+    <Box mt='1em' />
+    <Flex className='generalBox' justifyContent='center' alignItems='center' flexDir='column'>
+      {filterSelector}
+      {filterSettings}
+    </Flex>
+    <Box mt='1.5em' />
+
+    <Heading>General Visualization</Heading>
+    <Box mt='1em' />
+
+    <Flex className='generalBox' justifyContent='center' alignItems='center'>
+      {
+        stored ? <EnergyComp onChange={onStoreChange} stored={stored} /> : <Spinner />
+      }
+    </Flex>
+
+    <Box mt='1.5em' />
+    <Flex justifyContent='center' alignItems='center' gap='5rem' mr='1' ml='1' mb='4'>
+      <Button colorScheme='green' w='15em' isLoading={isSaving} onClick={save}>
+        Save Changes
+      </Button>
+      <Button colorScheme='red' w='15em' isLoading={isLoading} onClick={() => setUpdate(Math.random())}>
+        Reset
+      </Button>
+    </Flex>
+  </>
+
+  const enabled = stored ? stored.enabled : false
+  const onSwitchEnable = (e: ChangeEvent<HTMLInputElement>) => {
+    if(!stored)
+      return
+
+    const checked = e.target.checked
+
+    stored.enabled = checked
+    setStorage({ ...stored })
+    const base = getBaseUrl(window.location)
+
+    fetch(`${base}/enabled?enabled=${checked}`)
+  }
   return (
     <>
       <Flex justifyContent='center' alignItems='center' flexDirection='column' mt='4'>
@@ -94,42 +146,13 @@ function App() {
           </IconButton>
         </Flex>
 
-        <Box mt='2em' />
+        <Flex justifyContent='center' alignItems='center'>
+              <Switch mr='2rem' size='lg' isChecked={enabled} onChange={e => onSwitchEnable(e)} />
+              <Text>{enabled ? "turned On" : "turned Off"}</Text>
+            </Flex>
+      <Box mt='2em' />
 
-        <Heading>Effect</Heading>
-        <Box mt='1em' />
-        <Flex className='generalBox' justifyContent='center' alignItems='center' flexDir='column'>
-          {modeSelector}
-          {modeSettings}
-        </Flex>
-
-        <Box mt='1.5em' />
-
-        <Heading>Filter</Heading>
-        <Box mt='1em' />
-        <Flex className='generalBox' justifyContent='center' alignItems='center' flexDir='column'>
-          {filterSelector}
-          {filterSettings}
-        </Flex>
-        <Box mt='1.5em' />
-
-        <Heading>General Visualization</Heading>
-        <Box mt='1em' />
-
-        <Flex className='generalBox' justifyContent='center' alignItems='center'>
-          {
-            stored ? <EnergyComp onChange={onStoreChange} stored={stored} /> : <Spinner />
-          }
-        </Flex>
-      </Flex>
-      <Box mt='1.5em' />
-      <Flex justifyContent='center' alignItems='center' gap='5rem' mr='1' ml='1' mb='4'>
-        <Button colorScheme='green' w='15em' isLoading={isSaving} onClick={save}>
-          Save Changes
-        </Button>
-      <Button colorScheme='red' w='15em' isLoading={isLoading} onClick={() => setUpdate(Math.random())}>
-          Reset
-        </Button>
+        { !stored ? <Spinner /> : enabled ? content : <></> }
       </Flex>
     </>
   )
@@ -268,7 +291,7 @@ function getEnergyQuery(stored: StoredData) {
 
 function getBaseUrl(location: Location) {
   const { protocol, host } = location
-  return `${protocol}//${host}`
+  return `${protocol}//${host/*"10.6.0.1:6789"*/}`
 }
 
 type ChangeFunc = (newMode: string) => void
