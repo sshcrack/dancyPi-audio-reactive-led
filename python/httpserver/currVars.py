@@ -21,7 +21,8 @@ data = {
     "energy_speed_mult": 1,
     "energy_curr": 1,
     "energy_sensitivity": 1,
-    "rainbow_speed": 1
+    "rainbow_speed": 1,
+    "enabled": True
 }
 
 

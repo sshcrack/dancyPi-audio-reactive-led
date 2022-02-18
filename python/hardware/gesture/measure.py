@@ -3,8 +3,8 @@ import RPi.GPIO as GPIO
 from threading import Thread
 import time
 from config import STATUS_LED_PIN
+from httpserver.currVars import getConfig, setConfig
 
-enabled = True
 shouldRun = True
 
 g=grove_gesture_sensor.gesture()
@@ -15,8 +15,7 @@ def hasGesture():
         gest=g.return_gesture()
         return gest != 0
 
-def ledUpdate():
-    global enabled
+def ledUpdate(enabled: bool):
     GPIO.output(STATUS_LED_PIN, enabled)
 
 def measureThread():
@@ -25,15 +24,17 @@ def measureThread():
     g.init()
     GPIO.setup(STATUS_LED_PIN, GPIO.OUT)
 
-    global enabled, shouldRun
+    global shouldRun
     print(f"Should run {shouldRun}")
 
-    ledUpdate()
+    ledUpdate(isEnabled())
     while shouldRun:
         if hasGesture():
-            enabled =  not enabled
+            enabled = not isEnabled()
+
+            setConfig("enabled", enabled)
             print(f"Setting enabled to {enabled}")
-            ledUpdate()
+            ledUpdate(enabled)
 
         time.sleep(.1)
 
@@ -41,8 +42,7 @@ def measureThread():
     print("Exiting thread...")
 
 def isEnabled():
-    global enabled
-    return enabled
+    return getConfig("enabled")
 
 def stop():
     global shouldRun
