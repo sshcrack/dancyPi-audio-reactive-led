@@ -116,10 +116,10 @@ def main():
         delta = getDeltaTime()
         if enabled and currEnabled < 1:
             funcOut = multipleIntArr(funcOut, currEnabled)
-            currEnabled =  min(currEnabled + delta * curr_speed, 1)
+            currEnabled =  min(currEnabled + delta * 3, 1)
         elif not enabled and currEnabled > 0:
             funcOut = multipleIntArr(funcOut, currEnabled)
-            currEnabled = max(0, currEnabled - delta * curr_speed)
+            currEnabled = max(0, currEnabled - delta * 3)
         else:
             if multiplier != 1:
                 funcOut *= multipleIntArr(funcOut, multiplier)
