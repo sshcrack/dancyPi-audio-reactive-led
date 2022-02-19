@@ -21,7 +21,7 @@ if DEVICE == 'pi':
     """Set to True because Raspberry Pi doesn't use hardware dithering"""
 
 N_PIXELS = 150
-"""Number of pixels in the LED strip (must match ESP8266 firmware)"""
+"""Number of pixels in the LED strip"""
 
 STATUS_LED_PIN = 4
 """Pin of the status led to use"""
