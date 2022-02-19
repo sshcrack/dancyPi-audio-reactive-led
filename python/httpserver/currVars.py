@@ -1,6 +1,12 @@
 from typing import List
+import RPi.GPIO as GPIO
 import json
+from config import STATUS_LED_PIN
 
+
+GPIO.setmode(GPIO.BCM)
+def ledUpdate(enabled: bool):
+    GPIO.output(STATUS_LED_PIN, enabled)
 
 data = {
     "mode": "spectrum",
@@ -26,6 +32,10 @@ data = {
 }
 
 
+if STATUS_LED_PIN != None:
+    GPIO.setup(STATUS_LED_PIN, GPIO.OUT)
+
+
 def load():
     global data
 
@@ -39,6 +49,9 @@ def load():
 
     if f != None and not f.closed:
         f.close()
+    
+    if STATUS_LED_PIN != None:
+        ledUpdate(data.enabled)
 
 
 def save():
@@ -110,11 +123,18 @@ def getConfig(key: str):
     global data
     return data.get(key)
 
-    
+
 def setConfig(key: str, val):
     global data
+    
+    if key == "enabled" and STATUS_LED_PIN != None:
+        ledUpdate(val)
     data[key] = val
-
+    
 def getAllVars():
     global data
     return data
+
+def cleanupGPIO():
+    print("Cleaning up GPIO...")
+    GPIO.cleanup()
