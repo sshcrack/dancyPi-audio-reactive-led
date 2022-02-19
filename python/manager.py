@@ -142,3 +142,5 @@ finally:
 
     print("Saving config")
     currVars.save()
+    
+    currVars.cleanupGPIO()
