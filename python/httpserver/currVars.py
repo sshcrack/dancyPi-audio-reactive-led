@@ -51,7 +51,7 @@ def load():
         f.close()
     
     if STATUS_LED_PIN != None:
-        ledUpdate(data.enabled)
+        ledUpdate(data.get("enabled"))
 
 
 def save():

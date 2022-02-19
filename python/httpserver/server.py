@@ -14,6 +14,8 @@ from httpserver.routes.setspeed import onSetSpeed
 from httpserver.routes.vars import onVars
 import mimetypes
 
+from interfaces import getIPs
+
 def run_server():
     run(addr="0.0.0.0", port=6789)
 
@@ -58,10 +60,8 @@ class Handler(BaseHTTPRequestHandler):
             status, res = onAvailable(self, params)
 
         if status == 404:
-            print("Returning serve")
             return self.serveStaticFiles()
 
-        print("Sending default")
         self.send_response(status)
         self._set_headers()
         self.wfile.write(json.dumps(res).encode("utf-8"))
@@ -93,13 +93,11 @@ class Handler(BaseHTTPRequestHandler):
         if path.isfile(index_file):
             return defaultReturn(index_file)
         
-        print("Index File", index_file, "and normal file", first_lookup, "could not be found. Returning 404")
         self.send_response(404)
         self.send_header("Access-Control-Allow-Origin", "*")
         self.send_header("Content-Type", "text/plain")
         self.end_headers()
 
-        self.wfile.write("Not Found".encode("utf-8"))
         self.wfile.close()
         return
 
@@ -112,7 +110,15 @@ def run(server_class=ThreadedHTTPServer, handler_class=Handler, addr="localhost"
     server_address = (addr, port)
     httpd = server_class(server_address, handler_class)
 
-    print(f"Starting httpd server on {addr}:{port}")
+
+    ips = [addr]
+    if addr == "0.0.0.0":
+        ips = getIPs()
+    
+    print("Server started listening on")
+    for ip in ips:
+        print(f"    http://{ip}:{port}")
+
     httpd.serve_forever()
 
 thread = Thread(target=run_server, daemon=True)
