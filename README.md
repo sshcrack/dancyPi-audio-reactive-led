@@ -15,8 +15,11 @@ sudo python3 manager.py
 ```
 
 ## HTTP-Server
-### Listening by default on 6789
-### WebGUI should be available at `http://RASPI_IP:6789`
+To obtain where the server is listening enter this
+(make sure to be in rpi-music-visualizer/python
+```bash
+python3 listening.py
+```
 
 ------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------
