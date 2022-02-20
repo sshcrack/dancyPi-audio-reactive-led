@@ -1,5 +1,6 @@
 from http.server import HTTPServer, BaseHTTPRequestHandler, SimpleHTTPRequestHandler
 import json
+from config import BIND_ADDRESS, PORT
 from os import path
 from socketserver import ThreadingMixIn
 from threading import Thread
@@ -17,7 +18,7 @@ import mimetypes
 from interfaces import getIPs
 
 def run_server():
-    run(addr="0.0.0.0", port=6789)
+    run(addr=BIND_ADDRESS, port=PORT)
 
 websiteFiles = path.join(path.dirname(path.realpath(__file__)), "../..", "website", "build")
 class Handler(BaseHTTPRequestHandler):
