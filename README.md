@@ -11,13 +11,13 @@ Installing is the same as for Naztronaut install
 
 ## Starting
 ```shell
-sudo python3 manager.py
+sudo service rpimusicvis start
 ```
 
 ## HTTP-Server
 To obtain where the server is listening enter this
 (make sure to be in rpi-music-visualizer/python
-```bash
+```shell
 python3 listening.py
 ```
 
