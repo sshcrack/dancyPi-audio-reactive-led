@@ -1,0 +1,12 @@
+[Unit]
+Description=RPI Music Visualizer by sshcrack
+After=multi-user.target
+
+[Service]
+Type=simple
+Restart=always 
+WorkingDirectory=WORK_DIR
+ExecStart=/bin/bash RUN_SCRIPT
+
+[Install]
+WantedBy=multi-user.target

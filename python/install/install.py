@@ -7,19 +7,47 @@ import sys
 sys.path.append('..')
 
 import os
+from os import path
 from tools.tools import check_int
 from json import dumps
 from shutil import copy2
 
+add_service = False
 
+def setup_service():
+    global add_service
+    if not add_service:
+        return
+
+    print("================== Adding service ======================")
+    f = open("rpimusicvisualizer.service","r")
+    content = f.read()
+    f.close()
+
+    run_path = path.abspath(path.join(path.dirname(__file__), "..", "run.sh"))
+    run_dir = path.dirname(run_path)
+
+    content = content.replace("WORK_DIR", run_dir)
+    content = content.replace("RUN_SCRIPT", run_path)
+
+    with open("/etc/systemd/system/rpimusicvisualizer.service", "w") as f:
+        f.write(content)
+
+    print("================== Completed adding service ============")
+    print("================== Start enabling service ==============")
+    os.system("systemctl enable rpimusicvisualizer.service")
+    os.system("systemctl start rpimusicvisualizer")
+    print("================== Completed enabling service ==========")
 def setup_config():
+    global add_servicdäe
     print("================== Setting up config ====================")
-    led_pin = number_input("To which pin is your led strip connected (default 18)", default=18, optional=True)
+    led_pin = number_input("To which pin is your led strip connected? (default 18)", default=18, optional=True)
     led_invert = boolean_input("Do you have a inverting logic level converter installed? (Default False, if you dont know what it is just enter no)")
     n_pixels = number_input("How many leds does your led strip have?")
     status_led_pin = number_input("Where is your status led installed (enter if you dont have one)", True)
     gesture_sensor_enabled = boolean_input("Do you have a grove gesture sensor installed?")
-    
+    add_service = boolean_input("Do you want to start the visualizer at startup?")
+
     mappings = {
         "LED_PIN": led_pin,
         "LED_INVERT": led_invert,
@@ -52,7 +80,6 @@ def setup_config():
     print("================== Completed user prompts ================")
     print("================== Saving config =========================")
     with open("../config.py", "w") as f:
-        print("Writing", config_result)
         f.write(config_result)
 
     print("================== Config saved ==========================")
@@ -154,3 +181,4 @@ setup_config()
 install_dependencies()
 replace_asound()
 edit_alsa_conf()
+setup_service()
