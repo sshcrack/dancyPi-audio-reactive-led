@@ -56,7 +56,6 @@ def setup_config():
         f.write(config_result)
 
     print("================== Config saved ==========================")
-    sys.exit()
 
 def boolean_input(question: str):
     out = None
