@@ -25,5 +25,5 @@ yarn-error.log*
 
 #python
 __pycache__
-
+python/config.py
 python/vars.json

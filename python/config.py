@@ -9,19 +9,22 @@ DEVICE = 'pi'
 PORT=6789
 BIND_ADDRESS='0.0.0.0'
 
-if DEVICE == 'pi':
-    LED_PIN = 18
-    """GPIO pin connected to the LED strip pixels (must support PWM)"""
-    LED_FREQ_HZ = 800000
-    """LED signal frequency in Hz (usually 800kHz)"""
-    LED_DMA = 5
-    """DMA channel used for generating PWM signal (try 5)"""
-    BRIGHTNESS = 255
-    """Brightness of LED strip between 0 and 255"""
-    LED_INVERT = False
-    """Set True if using an inverting logic level converter"""
-    SOFTWARE_GAMMA_CORRECTION = True
-    """Set to True because Raspberry Pi doesn't use hardware dithering"""
+LED_PIN = 18
+"""GPIO pin connected to the LED strip pixels (must support PWM)"""
+
+LED_FREQ_HZ = 800000
+"""LED signal frequency in Hz (usually 800kHz)"""
+
+LED_DMA = 5
+"""DMA channel used for generating PWM signal (try 5)"""
+
+BRIGHTNESS = 255
+"""Brightness of LED strip between 0 and 255"""
+
+LED_INVERT = False
+"""Set True if using an inverting logic level converter"""
+SOFTWARE_GAMMA_CORRECTION = True
+"""Set to True because Raspberry Pi doesn't use hardware dithering"""
 
 N_PIXELS = 150
 """Number of pixels in the LED strip"""

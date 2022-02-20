@@ -110,11 +110,16 @@ def run(server_class=ThreadedHTTPServer, handler_class=Handler, addr="localhost"
     server_address = (addr, port)
     httpd = server_class(server_address, handler_class)
 
+    ips = getIPs()
+    last_addr = ".".join(addr.split(".")[:-1])
 
-    ips = [addr]
-    if addr == "0.0.0.0":
-        ips = getIPs()
-    
+    matching_ips = ips
+    if addr != "0.0.0.0":
+        matching_ips = [ "127.0.0.1"]
+        for ip in ips:
+            if last_addr in ip:
+                matching_ips.append(ip)
+
     print("Server started listening on")
     for ip in ips:
         print(f"    http://{ip}:{port}")

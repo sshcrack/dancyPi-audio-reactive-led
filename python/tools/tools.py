@@ -32,7 +32,7 @@ def getDeltaTime(currTime: Optional[float]=None):
     
 
     
-def isInt(potential_int: str):
+def check_int(potential_int: str):
     try:
         int(potential_int)
         return True

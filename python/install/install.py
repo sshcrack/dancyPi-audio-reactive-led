@@ -1,12 +1,91 @@
 # install.py
 # Version: 1.0.0
 # Installs dependences needed for Dancy Pi
-# Author: Nazmus Nasir
-# Website: https://www.easyprogramming.net
+# Author: Nazmus Nasir (modified by sshcrack)
+# Website: https://www.easyprogramming.net / https://sshcrack.me
+import sys
+sys.path.append('..')
 
 import os
+from tools.tools import check_int
+from json import dumps
 from shutil import copy2
 
+
+def setup_config():
+    print("================== Setting up config ====================")
+    led_pin = number_input("To which pin is your led strip connected (default 18)", default=18, optional=True)
+    led_invert = boolean_input("Do you have a inverting logic level converter installed? (Default False, if you dont know what it is just enter no)")
+    n_pixels = number_input("How many leds does your led strip have?")
+    status_led_pin = number_input("Where is your status led installed (enter if you dont have one)", True)
+    gesture_sensor_enabled = boolean_input("Do you have a grove gesture sensor installed?")
+    
+    mappings = {
+        "LED_PIN": led_pin,
+        "LED_INVERT": led_invert,
+        "N_PIXELS": n_pixels,
+        "STATUS_LED_PIN": status_led_pin,
+        "GESTURE_SENSOR_ENABLED": gesture_sensor_enabled
+    }
+    mapping_keys = list(mappings.keys())
+
+    config_file = open("../config.py", "r")
+    config = config_file.read()
+
+    config_file.close()
+    config = config.split("\n")
+
+    for i in range(len(config)):
+        entry = config[i]
+        entry_var = entry.replace(" ", "").split("=")[0]
+
+        if "=" not in entry or entry_var not in mapping_keys:
+            continue
+
+        entry = entry.split("=")
+        entry[-1] = dumps(mappings[entry_var])
+        entry = "=".join(entry)
+
+        config[i] = entry
+
+    config_result = "\n".join(config)
+    print("================== Completed user prompts ================")
+    print("================== Saving config =========================")
+    with open("../config.py", "w") as f:
+        print("Writing", config_result)
+        f.write(config_result)
+
+    print("================== Config saved ==========================")
+    sys.exit()
+
+def boolean_input(question: str):
+    out = None
+    while out == None:
+        print(question + " (yes/no)")
+        out_str = input(" >> ").lower()
+
+        if out_str in [ "y", "yes"]:
+            out = True
+        elif out_str in [ "n", "no"]:
+            out = False
+        else:
+            print("Invalid input can either be yes or no")
+    return out
+
+def number_input(question: str, optional = False, default=None):
+    out = default
+    while True:
+        print(question)
+        out_str = input(" >> ")
+        if optional and len(out_str.replace(" ", "")) == 0:
+            break
+
+        if check_int(out_str):
+            out = int(out_str)
+            break
+        else:
+            print("Input has to be a number and can not have decimal points")
+    return out
 
 def install_dependencies():
     print("================== Start Installing PIP ==================")
@@ -72,6 +151,7 @@ def edit_alsa_conf():
     print("================== Completed replacing text in alsa.conf ==================")
 
 
+setup_config()
 install_dependencies()
 replace_asound()
 edit_alsa_conf()
