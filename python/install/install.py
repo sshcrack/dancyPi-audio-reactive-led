@@ -39,7 +39,7 @@ def setup_service():
     os.system("systemctl start rpimusicvisualizer")
     print("================== Completed enabling service ==========")
 def setup_config():
-    global add_servicdäe
+    global add_service
     print("================== Setting up config ====================")
     led_pin = number_input("To which pin is your led strip connected? (default 18)", default=18, optional=True)
     led_invert = boolean_input("Do you have a inverting logic level converter installed? (Default False, if you dont know what it is just enter no)")
