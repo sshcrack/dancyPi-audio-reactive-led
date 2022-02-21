@@ -132,7 +132,7 @@ function App() {
     setStorage({ ...stored })
     const base = getBaseUrl(window.location)
 
-    const res = await fetch(`${base}/enabled?enabled=${enabled}`)
+    const res = await fetch(`${base}/enabled?enabled=${checked}`)
       .catch(e => { console.error(e) })
 
     const success = res && res?.status === 200
