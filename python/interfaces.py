@@ -3,7 +3,7 @@ import subprocess
 
 rc = subprocess.call(['which', 'ifconfig'])
 if rc != 0:
-    print 'Make sure to be running as root'
+    print('Make sure to be running as root')
 
 def getIPs():
     out = subprocess.run([ "ifconfig", "-a"], capture_output=True).stdout.decode("utf-8")
