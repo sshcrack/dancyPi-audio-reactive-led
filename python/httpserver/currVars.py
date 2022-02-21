@@ -129,7 +129,7 @@ def setConfig(key: str, val):
     global data
     
     if key == "enabled":
-        if data["locked"]:
+        if data["locked"] == True:
             return
 
         if STATUS_LED_PIN != None:
