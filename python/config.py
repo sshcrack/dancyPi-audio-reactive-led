@@ -32,7 +32,7 @@ N_PIXELS = 150
 STATUS_LED_PIN = 4
 """Pin of the status led to use"""
 
-GESTURE_SENSOR_ENABLED = False
+GESTURE_SENSOR_ENABLED = True
 """Weither a Groove Gesture Sensor is connected to the pi"""
 
 GAMMA_TABLE_PATH = os.path.join(os.path.dirname(__file__), 'modes', 'visualization', 'gamma_table.npy')

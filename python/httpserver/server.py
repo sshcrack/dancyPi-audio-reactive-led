@@ -8,6 +8,7 @@ from urllib.parse import parse_qs, urlparse
 from httpserver.routes.available import onAvailable
 from httpserver.routes.enabled import onEnabled
 from httpserver.routes.energy import onEnergy
+from httpserver.routes.locked import onLocked
 from httpserver.routes.multiplier import onMultiplier
 from httpserver.routes.setmode import onSetMode
 from httpserver.routes.filter import onFilter
@@ -40,6 +41,10 @@ class Handler(BaseHTTPRequestHandler):
             
         if self.path.startswith("/enabled"):
             status, res = onEnabled(self, params)
+            
+        if self.path.startswith("/locked"):
+            status, res = onLocked(self, params)
+
 
         if self.path.startswith("/speed"):
             status, res = onSetSpeed(self, params)

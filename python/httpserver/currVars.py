@@ -28,7 +28,8 @@ data = {
     "energy_curr": 1,
     "energy_sensitivity": 1,
     "rainbow_speed": 1,
-    "enabled": True
+    "enabled": True,
+    "locked": False
 }
 
 
@@ -127,8 +128,12 @@ def getConfig(key: str):
 def setConfig(key: str, val):
     global data
     
-    if key == "enabled" and STATUS_LED_PIN != None:
-        ledUpdate(val)
+    if key == "enabled":
+        if data["locked"]:
+            return
+
+        if STATUS_LED_PIN != None:
+            ledUpdate(val)
     data[key] = val
     
 def getAllVars():
