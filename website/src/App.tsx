@@ -1,6 +1,6 @@
 import { Box, Button, Flex, Heading, IconButton, Select, Spinner, Switch, Text, useColorMode, useToast } from "@chakra-ui/react"
 import { ChangeEvent, Dispatch, useCallback, useEffect, useState } from 'react'
-import { FaRaspberryPi, FaRegMoon, FaRegSun } from "react-icons/fa"
+import { FaLock, FaRaspberryPi, FaRegMoon, FaRegSun, FaUnlock } from "react-icons/fa"
 import './App.css'
 import EnergyComp from './components/Energy'
 import GeneralComp from './components/GeneralComp'
@@ -121,8 +121,9 @@ function App() {
   </>
 
   const enabled = stored ? stored.enabled : false
-  const onSwitchEnable = (e: ChangeEvent<HTMLInputElement>) => {
-    if(!stored)
+  const locked = stored ? stored.locked : false
+  const onSwitchEnable = async (e: ChangeEvent<HTMLInputElement>) => {
+    if (!stored || stored.locked)
       return
 
     const checked = e.target.checked
@@ -131,8 +132,50 @@ function App() {
     setStorage({ ...stored })
     const base = getBaseUrl(window.location)
 
-    fetch(`${base}/enabled?enabled=${checked}`)
+    const res = await fetch(`${base}/enabled?enabled=${enabled}`)
+      .catch(e => { console.error(e) })
+
+    const success = res && res?.status === 200
+    if (success)
+      return
+
+    toast({
+      title: "Error",
+      status: "error",
+      description: "Could not enable/disable led strips"
+    })
+    stored.enabled = !checked
+    setStorage({ ...stored })
+    setUpdate(Math.random())
   }
+
+  const toggleLock = async () => {
+    if (!stored)
+      return
+
+    const locked = !stored.locked
+
+    stored.locked = locked
+    setStorage({ ...stored })
+    const base = getBaseUrl(window.location)
+
+    const res = await fetch(`${base}/locked?locked=${locked}`)
+      .catch(e => { console.error(e) })
+
+    const success = res && res?.status === 200
+    if (success)
+      return
+
+    toast({
+      title: "Error",
+      status: "error",
+      description: "Could not unlock led strips"
+    })
+    stored.locked = !locked
+    setStorage({ ...stored })
+    setUpdate(Math.random())
+  }
+
   return (
     <>
       <Flex justifyContent='center' alignItems='center' flexDirection='column' mt='4'>
@@ -146,13 +189,18 @@ function App() {
           </IconButton>
         </Flex>
 
-        <Flex justifyContent='center' alignItems='center'>
-              <Switch mr='2rem' size='lg' isChecked={enabled} onChange={e => onSwitchEnable(e)} />
-              <Text>{enabled ? "turned On" : "turned Off"}</Text>
-            </Flex>
-      <Box mt='2em' />
+        <Flex justifyContent='space-around' className='topControl'>
+          <Flex justifyContent='center' alignItems='center'>
+            <Switch mr='2rem' size='lg' isChecked={enabled} onChange={e => onSwitchEnable(e)} disabled={locked} />
+            <Text>{enabled ? "turned On" : "turned Off"}</Text>
+          </Flex>
+          <Flex justifyContent='center' alignItems='center'>
+            <IconButton icon={locked ? <FaLock /> : <FaUnlock />} onClick={() => toggleLock()} aria-label="Lock/Unlock gesture" />
+          </Flex>
+        </Flex>
+        <Box mt='2em' />
 
-        { !stored ? <Spinner /> : enabled ? content : <></> }
+        {!stored ? <Spinner /> : enabled ? content : <></>}
       </Flex>
     </>
   )
@@ -291,7 +339,7 @@ function getEnergyQuery(stored: StoredData) {
 
 function getBaseUrl(location: Location) {
   const { protocol, host } = location
-  return `${protocol}//${host/*"10.6.0.1:6789"*/}`
+  return `${protocol}//${/*host*/"localhost:6789"}`
 }
 
 type ChangeFunc = (newMode: string) => void

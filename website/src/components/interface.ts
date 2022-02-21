@@ -30,6 +30,7 @@ export type StoredData = NormalStorageKeys & {
 
 export interface NormalStorageKeys {
     mode: string;
+    locked: boolean;
     filter_mode: string;
     speed: number;
     multiplier: number;

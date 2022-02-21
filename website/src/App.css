@@ -10,6 +10,10 @@
     font-size: 10rem;
 }
 
+.topControl {
+    width: 25%
+}
+
 @media screen and (max-width: 768px) {
     .generalBox {
         width: 90%;
@@ -21,5 +25,9 @@
 
     .title {
         width: 6em;
+    }
+
+    .topControl {
+        width: 90%;
     }
 }
