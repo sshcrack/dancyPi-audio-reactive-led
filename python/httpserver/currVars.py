@@ -41,6 +41,7 @@ def load():
     global data
 
     f = None
+    print("Loading variables...")
     try:
         f = open("vars.json", "r")
         raw = f.read()
@@ -57,6 +58,7 @@ def load():
 
 def save():
     global data
+    print("Saving variables...")
     f = open("vars.json", "w")
     f.write(json.dumps(data))
 

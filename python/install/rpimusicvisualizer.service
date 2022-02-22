@@ -7,6 +7,7 @@ Type=simple
 Restart=always 
 WorkingDirectory=WORK_DIR
 ExecStart=/bin/bash RUN_SCRIPT
+KillSignal=SIGINT
 
 [Install]
 WantedBy=multi-user.target
