@@ -104,7 +104,7 @@ filters = {
                 "func": validate_float("speed"),
                 "type": "float",
                 "sug_min": 0,
-                "sug_max": 15
+                "sug_max": 1250
             }
         }
     },
