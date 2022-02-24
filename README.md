@@ -6,7 +6,7 @@
 <br>
 
 ## Installing
-## Detailed Instructions at [blog](https://sshcrack.me/rpi-music-visualizer/)
+## Detailed Instructions [here](https://sshcrack.me/rpi-music-visualizer/)
 [Click here.](#install-git--clone-repo)
 Installing is the same as for Naztronaut install
 
