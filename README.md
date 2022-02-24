@@ -1,11 +1,12 @@
 # RPI Music Visualizer
+#### NOTE: This is a Repository for RPI ONLY (others haven't been tested)
 
-This repository, as you can see, has been forked many times before.
-## NOTE: This is a Repository for RPI ONLY (others haven't been tested)
+<br>
+<br>
+<br>
 
-# Changes
-#### Note: No GUI available currently (implementing it with new modes is just a mess)
 ## Installing
+## Detailed Instructions at [blog](https://sshcrack.me/rpi-music-visualizer/)
 [Click here.](#install-git--clone-repo)
 Installing is the same as for Naztronaut install
 
@@ -20,49 +21,6 @@ To obtain where the server is listening enter this
 ```shell
 python3 listening.py
 ```
-
-------------------------------------------------------------------------------------
-------------------------------------------------------------------------------------
-
-------------------------------------------------------------------------------------
-------------------------------------------------------------------------------------
-# (Obsolete as WebGUI was introduced)
-## Controlling modes
-### Modes available
-Are chaning where pixels are lighted up
-- full
-- scanner
-- stack
-
-General Link:
-`http://RASPI_IP:6789/setmode?mode={}`
-
-Lighting all leds up to white:
-`http://RASPI_IP:6789/setmode?mode=full`
-
-### Examples
-Stack: `http://RASPI_IP:6789/setmode?mode=stack&concurrent=5&speed=5`
-
-### Filters
-Filters are changing colors that get used
-- hex
-- normal
-- rainbow
-
-General Link:
-`http://RASPI_IP:6789/filter?mode={}`
-
-Changing colors to rainbow:
-`http://RASPI_IP:6789/filter?mode=rainbow`
-
-#### Speed
-Change speed by using `http://RASPI_IP:6789/speed?speed={SPEED_in_numbers}`
-
-### Enabling visualization
-Default URL: `http://10.6.0.1:6789/energyspeed?brightness={brightness should be affected(true or false)}&speed={speed should be affected (true or false)}&sensitivity={sensitivity}&brightness_mult={brightness_multiplier}&speed_mult={speed_multiplier}`
-
-#### High Sensitivity High Brightness, Normal Speed
-URL: `http://RASPI_IP:6789/energyspeed?brightness=true&speed=true&sensitivity=15&brightness_mult=1&speed_mult=.5`
 
 ------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------
