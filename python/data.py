@@ -1,3 +1,4 @@
+import config
 import filters.rainbow
 import filters.normal
 import filters.hex
@@ -87,8 +88,8 @@ modes = {
         "required_vars": {
             "chunk_chunks": {
                 "sug_min": 1,
-                "sug_max": 500,
-                "func": validate_int("chunks", 1),
+                "sug_max": config.N_PIXELS,
+                "func": validate_int("chunks", 1, config.N_PIXELS),
                 "type": "int",
                 "min": 0
             }
