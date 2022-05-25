@@ -26,7 +26,7 @@ LED_INVERT = False
 SOFTWARE_GAMMA_CORRECTION = True
 """Set to True because Raspberry Pi doesn't use hardware dithering"""
 
-N_PIXELS = 256
+N_PIXELS = 180
 """Number of pixels in the LED strip"""
 
 STATUS_LED_PIN = 4
@@ -41,7 +41,7 @@ GAMMA_TABLE_PATH = os.path.join(os.path.dirname(__file__), 'modes', 'visualizati
 MIC_RATE = 48000
 """Sampling frequency of the microphone in Hz"""
 
-DISPLAY_FPS = True
+DISPLAY_FPS = False
 
 FPS = 50
 """Desired refresh rate of the visualization (frames per second)
