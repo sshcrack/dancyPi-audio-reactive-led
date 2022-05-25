@@ -1,17 +1,19 @@
 import hardware.gesture.grove_gesture_sensor as grove_gesture_sensor
 from threading import Thread
 import time
-from config import STATUS_LED_PIN, GESTURE_SENSOR_ENABLED
+from config import GESTURE_SENSOR_ENABLED
 from httpserver.currVars import getConfig, setConfig
+
 shouldRun = True
 
 if GESTURE_SENSOR_ENABLED:
-        g=grove_gesture_sensor.gesture()
+    g = grove_gesture_sensor.Gesture()
 
 
 def hasGesture():
-        gest=g.return_gesture()
-        return gest != 0
+    gest = g.return_gesture()
+    return gest != 0
+
 
 def measureThread():
     print("Initializing gesture...")
@@ -34,12 +36,15 @@ def measureThread():
 
     print("Exiting thread...")
 
+
 def isEnabled():
     return getConfig("enabled")
+
 
 def stop():
     global shouldRun
     shouldRun = False
+
 
 thread1 = Thread(target=measureThread, daemon=True)
 thread1.start()

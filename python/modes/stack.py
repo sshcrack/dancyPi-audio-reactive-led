@@ -3,12 +3,14 @@ from math import ceil, floor
 import config
 import numpy as np
 from httpserver.currVars import getConfig, getGeneralSpeed
-from tools.tools import check_int, check_float, getDeltaTime
+from tools.tools import getDeltaTime
 
 curr_stack = 0
 pixel_locations = []
 animating_out = False
 animating_status = 0
+
+
 def stack():
     global curr_stack, pixel_locations, animating_out, animating_status
     general_speed_modifier = .25
@@ -20,7 +22,7 @@ def stack():
     concurrent = getConfig("stack_concurrent")
     stack_speed = getConfig("stack_speed")
 
-    if curr_stack >= max_pixels :
+    if curr_stack >= max_pixels:
         curr_stack = 0
         pixel_locations = []
         animating_out = True
@@ -40,7 +42,7 @@ def stack():
                     continue
                 channel.append(0)
 
-            return np.array([ channel, channel, channel ])
+            return np.array([channel, channel, channel])
 
     pixel_length = len(pixel_locations)
     if pixel_length != concurrent:
@@ -48,7 +50,7 @@ def stack():
         if diff != 0:
             single_size = 1 / concurrent
             for i in range(diff):
-                pixel_locations.append( max_pixels + single_size * i * max_pixels )
+                pixel_locations.append(max_pixels + single_size * i * max_pixels)
 
     for i in range(len(pixel_locations)):
         curr = pixel_locations[i]
@@ -59,10 +61,11 @@ def stack():
             pixel_locations[i] = 0
 
     val = []
+
     def getMovePixel(pixel):
         for number in pixel_locations:
             floored = ceil(number)
-            if pixel == floored or floored <= curr_stack +1:
+            if pixel == floored or floored <= curr_stack + 1:
                 return number
         return None
 
@@ -72,9 +75,9 @@ def stack():
             val.append(255)
             continue
 
-        if movePixel != None:
+        if movePixel is not None:
             val.append(255)
-            if i <= curr_stack +1:
+            if i <= curr_stack + 1:
                 curr_stack += 1
                 index = pixel_locations.index(movePixel)
 
@@ -82,4 +85,4 @@ def stack():
             continue
 
         val.append(0)
-    return np.array([ val, val, val ])
+    return np.array([val, val, val])

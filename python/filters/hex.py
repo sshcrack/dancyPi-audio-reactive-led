@@ -7,6 +7,7 @@ import json
 
 from tools.tools import isColorHex, hex_to_rgb
 
+
 def hex(data):
     r, g, b = data
 
@@ -15,14 +16,15 @@ def hex(data):
     gradient_pixels = calculateGradient(len(r), gradient)
 
     for i in range(len(r)):
-        maxVal = np.amax(np.array([r[i], g[i], b[i]]))
+        maxVal = np.max(np.array([r[i], g[i], b[i]]))
         d_r, d_g, d_b = np.array(gradient_pixels[i])
 
         r[i] = maxVal * d_r
         g[i] = maxVal * d_g
         b[i] = maxVal * d_b
 
-    return np.array([ r, g, b])
+    return np.array([r, g, b])
+
 
 def validateGradient(param: List[str]) -> VerifierResult:
     if param == None or len(param) == 0 or param[0] == None:
@@ -61,11 +63,11 @@ def validateGradient(param: List[str]) -> VerifierResult:
                 "error": "List element has to have a length of 2",
                 "result": None
             }
-        
+
         step, curr_hex = el
         if type(step) is not float and type(step) is not int:
             return {
-                "error" :"GradientElement[0] has to be a float",
+                "error": "GradientElement[0] has to be a float",
                 "result": None
             }
 
@@ -94,7 +96,7 @@ def validateGradient(param: List[str]) -> VerifierResult:
             has_one = True
 
         rgb = hex_to_rgb(curr_hex)
-        out.append([ step, rgb ])
+        out.append([step, rgb])
 
     if not has_zero:
         first = out[0][1]

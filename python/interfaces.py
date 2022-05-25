@@ -1,24 +1,13 @@
-import subprocess
+from netifaces import interfaces, ifaddresses, AF_INET
 
-
-rc = subprocess.call(['which', 'ifconfig'])
-if rc != 0:
-    print('Make sure to be running as root')
 
 def getIPs():
-    out = subprocess.run([ "ifconfig", "-a"], capture_output=True).stdout.decode("utf-8")
-    newLines = filter(lambda e: "inet " in e, out.split("\n"))
-    newLines = map(lambda e: e.split(" "), newLines)
-    addresses = []
+    ip_list = []
+    for interface in interfaces():
+        ifaddressList = ifaddresses(interface)
+        if AF_INET not in ifaddressList.keys():
+            continue
 
-    for el in newLines:
-        for x in range(len(el)):
-            curr = el[x]
-            prevIndex = x -1
-            if(prevIndex < 0):
-                continue
-
-            prev = el[prevIndex]
-            if "inet" in prev:
-                addresses.append(curr)
-    return addresses
+        for link in ifaddressList[AF_INET]:
+            ip_list.append(link['addr'])
+    return ip_list

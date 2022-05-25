@@ -18,10 +18,14 @@ import mimetypes
 
 from interfaces import getIPs
 
+
 def run_server():
     run(addr=BIND_ADDRESS, port=PORT)
 
+
 websiteFiles = path.join(path.dirname(path.realpath(__file__)), "../..", "website", "build")
+
+
 class Handler(BaseHTTPRequestHandler):
 
     def _set_headers(self):
@@ -30,32 +34,30 @@ class Handler(BaseHTTPRequestHandler):
         self.end_headers()
 
     def do_GET(self):
-        res = { "error": "Path not found" }
+        res = {"error": "Path not found"}
         status = 404
 
         parsed = urlparse(self.path)
         params = parse_qs(parsed.query)
-    
+
         if self.path.startswith("/setmode"):
             status, res = onSetMode(self, params)
-            
+
         if self.path.startswith("/enabled"):
             status, res = onEnabled(self, params)
-            
+
         if self.path.startswith("/locked"):
             status, res = onLocked(self, params)
 
-
         if self.path.startswith("/speed"):
             status, res = onSetSpeed(self, params)
-
 
         if self.path.startswith("/filter"):
             status, res = onFilter(self, params)
 
         if self.path.startswith("/multiplier"):
             status, res = onMultiplier(self, params)
-            
+
         if self.path.startswith("/energy"):
             status, res = onEnergy(self, params)
 
@@ -72,7 +74,6 @@ class Handler(BaseHTTPRequestHandler):
         self._set_headers()
         self.wfile.write(json.dumps(res).encode("utf-8"))
 
-    
     def serveStaticFiles(self):
         server_path = self.path.replace("..", "")[1:]
         first_lookup = path.join(websiteFiles, server_path)
@@ -82,7 +83,7 @@ class Handler(BaseHTTPRequestHandler):
             guessed = mimetypes.guess_type(file_path)
             if guessed:
                 mime = guessed[0]
-            
+
             self.send_response(200)
             self.send_header("Access-Control-Allow-Origin", "*")
             self.send_header("Content-Type", mime)
@@ -95,10 +96,10 @@ class Handler(BaseHTTPRequestHandler):
             return defaultReturn(first_lookup)
 
         index_file = path.join(websiteFiles, server_path, "index.html")
-        
+
         if path.isfile(index_file):
             return defaultReturn(index_file)
-        
+
         self.send_response(404)
         self.send_header("Access-Control-Allow-Origin", "*")
         self.send_header("Content-Type", "text/plain")
@@ -106,6 +107,7 @@ class Handler(BaseHTTPRequestHandler):
 
         self.wfile.close()
         return
+
 
 class ThreadedHTTPServer(ThreadingMixIn, HTTPServer):
     """ This class allows to handle requests in separated threads.
@@ -116,12 +118,13 @@ def run(server_class=ThreadedHTTPServer, handler_class=Handler, addr="localhost"
     server_address = (addr, port)
     httpd = server_class(server_address, handler_class)
 
+    print("Getting ips...")
     ips = getIPs()
     last_addr = ".".join(addr.split(".")[:-1])
 
     matching_ips = ips
     if addr != "0.0.0.0":
-        matching_ips = [ "127.0.0.1"]
+        matching_ips = ["127.0.0.1"]
         for ip in ips:
             if last_addr in ip:
                 matching_ips.append(ip)
@@ -132,7 +135,9 @@ def run(server_class=ThreadedHTTPServer, handler_class=Handler, addr="localhost"
 
     httpd.serve_forever()
 
+
 thread = Thread(target=run_server, daemon=True)
+
 
 def start():
     if thread.is_alive():

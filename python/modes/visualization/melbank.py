@@ -30,7 +30,7 @@ Functions
 ---------
 """
 
-from numpy import abs, append, arange, insert, linspace, log10, round, zeros
+from numpy import abs, arange, linspace, log10, zeros
 
 
 def hertz_to_mel(freq):
@@ -61,7 +61,7 @@ def mel_to_hertz(mel):
     return 700.0 * (10**(mel / 2595.0)) - 700.0
 
 
-def melfrequencies_mel_filterbank(num_bands, freq_min, freq_max, num_fft_bands):
+def melfrequencies_mel_filterbank(num_bands, freq_min, freq_max):
     """Returns centerfrequencies and band edges for a mel filter bank
     Parameters
     ----------
@@ -71,8 +71,6 @@ def melfrequencies_mel_filterbank(num_bands, freq_min, freq_max, num_fft_bands):
         Minimum frequency for the first band.
     freq_max : scalar
         Maximum frequency for the last band.
-    num_fft_bands : int
-        Number of fft bands.
     Returns
     -------
     center_frequencies_mel : ndarray
@@ -127,7 +125,6 @@ def compute_melmat(num_mel_bands=12, freq_min=64, freq_max=8000,
             num_mel_bands,
             freq_min,
             freq_max,
-            num_fft_bands
         )
 
     center_frequencies_hz = mel_to_hertz(center_frequencies_mel)

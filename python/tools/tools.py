@@ -5,11 +5,16 @@ import re
 from tools.timer import getPrevTime
 
 
+def rgb_to_hex(r, g, b):
+    return f'#{r << 16 | g << 8 | b:06x}'
+
+
 def hex_to_rgb(hex_string):
     r_hex = hex_string[1:3]
     g_hex = hex_string[3:5]
     b_hex = hex_string[5:7]
     return int(r_hex, 16), int(g_hex, 16), int(b_hex, 16)
+
 
 def wheel(pos):
     """Generate rainbow colors across 0-255 positions."""
@@ -23,15 +28,15 @@ def wheel(pos):
         pos -= 170
         return [0, pos * 3, 255 - pos * 3]
 
-def getDeltaTime(currTime: Optional[float]=None):
+
+def getDeltaTime(currTime: Optional[float] = None):
     _time_prev = getPrevTime()
-    if currTime == None:
+    if currTime is None:
         currTime = time()
 
-    return (currTime - _time_prev)
-    
+    return currTime - _time_prev
 
-    
+
 def check_int(potential_int: str):
     try:
         int(potential_int)
@@ -40,7 +45,7 @@ def check_int(potential_int: str):
 
         return False
 
-        
+
 def check_float(potential_float):
     try:
         float(potential_float)
@@ -50,8 +55,7 @@ def check_float(potential_float):
     except TypeError:
         return False
 
-        
-        
+
 def check_int(potential_int):
     try:
         int(potential_int)

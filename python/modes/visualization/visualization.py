@@ -10,6 +10,7 @@ from scipy.ndimage.filters import gaussian_filter1d
 import config
 import modes.visualization.dsp as dsp
 
+
 def memoize(function):
     """Provides a decorator for memoizing functions"""
     from functools import wraps
@@ -23,6 +24,7 @@ def memoize(function):
             rv = function(*args)
             memo[args] = rv
             return rv
+
     return wrapper
 
 
@@ -74,7 +76,7 @@ gain = dsp.ExpFilter(np.tile(0.01, config.N_FFT_BINS),
 def visualize_scroll(mel):
     """Effect that originates in the center and scrolls outwards"""
     global p
-    mel = mel**2.0
+    mel = mel ** 2.0
     gain.update(mel)
     mel /= gain.value
     mel *= 255.0
@@ -103,9 +105,9 @@ def visualize_energy(mel):
     mel *= float((config.N_PIXELS // 2) - 1)
     # Map color channels according to energy in the different freq bands
     scale = 0.9
-    r = int(np.mean(mel[:len(mel) // 3]**scale))
-    g = int(np.mean(mel[len(mel) // 3: 2 * len(mel) // 3]**scale))
-    b = int(np.mean(mel[2 * len(mel) // 3:]**scale))
+    r = int(np.mean(mel[:len(mel) // 3] ** scale))
+    g = int(np.mean(mel[len(mel) // 3: 2 * len(mel) // 3] ** scale))
+    b = int(np.mean(mel[2 * len(mel) // 3:] ** scale))
     # Assign color to different frequency regions
     p[0, :r] = 255.0
     p[0, r:] = 0.0
@@ -128,7 +130,7 @@ _prev_spectrum = np.tile(0.01, config.N_PIXELS // 2)
 
 def visualize_spectrum(mel):
     """Effect that maps the Mel filterbank frequencies onto the LED strip"""
-    global _prev_spectrum, rgb_index, _time_prev
+    global _prev_spectrum
     mel = np.copy(interpolate(mel, config.N_PIXELS // 2))
     common_mode.update(mel)
     diff = mel - _prev_spectrum
@@ -160,10 +162,10 @@ prev_fps_update = time.time()
 
 
 def microphone_update(audio_samples):
-    global y_roll, prev_rms, prev_exp, prev_fps_update
+    global y_roll, prev_fps_update
     # Normalize samples between 0 and 1
 
-    y = audio_samples / 2.0**15
+    y = audio_samples / 2.0 ** 15
     # Construct a rolling window of audio samples
     y_roll[:-1] = y_roll[1:]
     y_roll[-1, :] = np.copy(y)
@@ -176,7 +178,7 @@ def microphone_update(audio_samples):
 
     # Transform audio input into the frequency domain
     N = len(y_data)
-    N_zeros = 2**int(np.ceil(np.log2(N))) - N
+    N_zeros = 2 ** int(np.ceil(np.log2(N))) - N
     # Pad with zeros until the next power of two
     y_data *= fft_window
     y_padded = np.pad(y_data, (0, N_zeros), mode='constant')
@@ -186,7 +188,7 @@ def microphone_update(audio_samples):
     # Scale data to values more suitable for visualization
     # mel = np.sum(mel, axis=0)
     mel = np.sum(mel, axis=0)
-    mel = mel**2.0
+    mel = mel ** 2.0
     # Gain normalization
     mel_gain.update(np.max(gaussian_filter1d(mel, sigma=1.0)))
     mel /= mel_gain.value

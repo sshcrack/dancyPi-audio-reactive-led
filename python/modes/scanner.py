@@ -11,6 +11,7 @@ print("Initial", center_pos)
 # -1 = 255 to 0
 direction = True
 
+
 def scanner():
     global center_pos, direction, max_pixels
 
@@ -19,11 +20,10 @@ def scanner():
 
     full_bright = getConfig("scanner_size")
     shadow_size = getConfig("scanner_shadow")
-    
+
     # 2 times for both sides
     total_size = full_bright + 2 * shadow_size
     half_size = total_size / 2
-
 
     if center_pos <= half_size:
         direction = 1
@@ -36,7 +36,7 @@ def scanner():
     min_shadow = center_pos - shadow_size
     max_shadow = center_pos + shadow_size
     for i in range(max_pixels):
-        if not ( i >= min_shadow and i <= max_shadow):
+        if not (min_shadow <= i <= max_shadow):
             channel.append(0)
             continue
 
@@ -46,4 +46,4 @@ def scanner():
 
         channel.append(brightness)
 
-    return np.array([ channel, channel, channel ])
+    return np.array([channel, channel, channel])

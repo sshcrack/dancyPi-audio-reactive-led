@@ -2,6 +2,7 @@ import filters.rainbow
 import filters.normal
 import filters.hex
 import modes.visualization.visualization as visualization
+import modes.visualization.chunk as chunk
 import modes.full
 import modes.stack
 import modes.scanner
@@ -9,10 +10,9 @@ import modes.scanner
 from tools.validators import validate_float, validate_int
 from httpserver.currVars import getFilterMode
 
+required_parsable = ["min", "max", "type", "sug_min", "sug_max"]
 
-required_parsable = [ "min", "max", "type", "sug_min", "sug_max" ]
-
-#! Make sure that requried vars are prefixed with root key (REQUIRED)
+# ! Make sure that required vars are prefixed with root key (REQUIRED)
 modes = {
     "scroll": {
         "func": visualization.visualize_scroll,
@@ -80,12 +80,24 @@ modes = {
             }
         }
     },
+    "chunk": {
+        "func": chunk.chunk,
+        "visualizer": True,
+        "filters": True,
+        "required_vars": {
+            "chunk_chunks": {
+                "sug_min": 1,
+                "sug_max": 500,
+                "func": validate_int("chunks", 1),
+                "type": "int",
+                "min": 0
+            }
+        }
+    },
 }
 modeKeys = modes.keys()
 
-
 rgb_index = 0
-
 
 filters = {
     "hex": {
@@ -113,6 +125,7 @@ filters = {
         "required_vars": {}
     }
 }
+
 
 def applyFilters(data):
     filter_mode = getFilterMode()

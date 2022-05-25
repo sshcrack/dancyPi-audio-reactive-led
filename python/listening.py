@@ -6,7 +6,7 @@ last_addr = ".".join(BIND_ADDRESS.split(".")[:-1])
 
 matching_ips = ips
 if BIND_ADDRESS != "0.0.0.0":
-    matching_ips = [ "127.0.0.1"]
+    matching_ips = ["127.0.0.1"]
     for ip in ips:
         if last_addr in ip:
             matching_ips.append(ip)

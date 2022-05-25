@@ -3,7 +3,6 @@ import numpy as np
 import pyaudio
 import config
 
-
 frames_per_buffer = int(config.MIC_RATE / config.FPS)
 stream: pyaudio.Stream = None
 p: pyaudio.PyAudio = None
@@ -14,9 +13,8 @@ prev_ovf_time = time.time()
 
 def start():
     global stream, p
-    if stream != None or p != None:
+    if stream is not None or p is not None:
         return False
-
 
     p = pyaudio.PyAudio()
     stream = p.open(format=pyaudio.paInt16,
@@ -26,6 +24,7 @@ def start():
                     frames_per_buffer=frames_per_buffer)
 
     return True
+
 
 def read():
     global overflows, prev_ovf_time
@@ -42,12 +41,13 @@ def read():
             prev_ovf_time = time.time()
             print('Audio buffer has overflowed {} times'.format(overflows))
 
-        return [ ]
+        return []
+
 
 def stop():
     global stream, p
 
-    if stream == None:
+    if stream is None:
         return print("Stream is None.")
 
     print("Closing stream.")
@@ -58,6 +58,7 @@ def stop():
     stream = None
     p = None
 
+
 def isRunning():
     global stream
-    return stream != None
+    return stream is not None

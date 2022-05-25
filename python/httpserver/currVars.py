@@ -1,12 +1,21 @@
 from typing import List
-import RPi.GPIO as GPIO
 import json
 from config import STATUS_LED_PIN
 
+status_led_available = False
+try:
+    import RPi.GPIO as GPIO
 
-GPIO.setmode(GPIO.BCM)
+    GPIO.setmode(GPIO.BCM)
+    status_led_available = True
+except Exception as e:
+    print("Could not import RPi, disabling status led")
+
+
 def ledUpdate(enabled: bool):
-    GPIO.output(STATUS_LED_PIN, enabled)
+    if status_led_available:
+        GPIO.output(STATUS_LED_PIN, enabled)
+
 
 data = {
     "mode": "spectrum",
@@ -32,8 +41,7 @@ data = {
     "locked": False
 }
 
-
-if STATUS_LED_PIN != None:
+if STATUS_LED_PIN is not None and status_led_available:
     GPIO.setup(STATUS_LED_PIN, GPIO.OUT)
 
 
@@ -49,10 +57,10 @@ def load():
     except (json.JSONDecodeError, FileNotFoundError):
         print("Could not parse json file. Staying with default.")
 
-    if f != None and not f.closed:
+    if f is not None and not f.closed:
         f.close()
-    
-    if STATUS_LED_PIN != None:
+
+    if STATUS_LED_PIN is not None:
         ledUpdate(data.get("enabled"))
 
 
@@ -89,6 +97,7 @@ def setGeneralSpeed(speed: float):
     global data
     data["speed"] = speed
 
+
 def getGeneralSpeed():
     global data
     energy_speed = data["energy_speed"]
@@ -98,9 +107,11 @@ def getGeneralSpeed():
 
     return speed
 
+
 def setSpeedMultiplier(mult: float):
     global data
     data["energyspeed_multiplier"] = mult
+
 
 def setMultiplier(multiplier: float):
     global data
@@ -112,7 +123,6 @@ def getMultiplier():
     return data["multiplier"]
 
 
-
 def setGradient(gradient: List[List]):
     global data
     data["hex_gradient"] = gradient
@@ -122,6 +132,7 @@ def getGradient():
     global data
     return data["hex_gradient"]
 
+
 def getConfig(key: str):
     global data
     return data.get(key)
@@ -129,19 +140,23 @@ def getConfig(key: str):
 
 def setConfig(key: str, val):
     global data
-    
+
     if key == "enabled":
-        if data.get("locked") == True:
+        if data.get("locked"):
             return
 
-        if STATUS_LED_PIN != None:
+        if STATUS_LED_PIN is not None:
             ledUpdate(val)
     data[key] = val
-    
+
+
 def getAllVars():
     global data
     return data
 
+
 def cleanupGPIO():
+    if not status_led_available:
+        return
     print("Cleaning up GPIO...")
     GPIO.cleanup()
