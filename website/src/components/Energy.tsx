@@ -9,7 +9,7 @@ export default function EnergyComp({ onChange, stored }: EnergyMeterProps) {
     const sensitivityVar: Var = {
         name: "energy_sensitivity",
         type: "float",
-        max: 1,
+        max: .99,
         min: 0
     }
 
@@ -46,7 +46,7 @@ export default function EnergyComp({ onChange, stored }: EnergyMeterProps) {
                 <GeneralNumber
                     curr={currSensitivity}
                     onChange={numb => updateStorage(sensitivityVar.name, numb)}
-                    step={.1}
+                    step={.01}
                     variable={sensitivityVar}
                     float={true}
                     disabled={bothDisabled}

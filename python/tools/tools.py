@@ -1,5 +1,5 @@
 from time import time
-from typing import Optional
+from typing import Optional, TypeVar
 import re
 
 from tools.timer import getPrevTime
@@ -72,3 +72,15 @@ def check_bool(potential_bool: str):
 
 def isColorHex(s: str):
     return re.search(r'^#(?:[0-9a-fA-F]{3}){1,2}$', str(s))
+
+
+T = TypeVar("T")
+
+
+def clamp(min_numb: T, value: T, max_numb: T):
+    if value < min_numb:
+        return min_numb
+    if value > max_numb:
+        return max_numb
+
+    return value

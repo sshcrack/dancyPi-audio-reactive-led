@@ -60,11 +60,16 @@ def onEnergy(_server: BaseHTTPRequestHandler, params: List[str]):
             "error": f"speed_mult can not be {speed_mult_str} (not valid float)"
         })
 
+    sense = float(sensitivity_str)
+    if sense > .99 or sense < 0:
+        return (400, {
+            "error": "Sensitivity has to be below .99 and equal or above 0"
+        })
     setConfig("energy_brightness", bright_res)
     setConfig("energy_brightness_mult", float(brightness_mult_str))
     setConfig("energy_speed", speed_res)
     setConfig("energy_speed_mult", float(speed_mult_str))
-    setConfig("energy_sensitivity", float(sensitivity_str))
+    setConfig("energy_sensitivity", sense)
 
     return (200, {
         "success": True

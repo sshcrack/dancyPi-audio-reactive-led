@@ -8,7 +8,7 @@ from tools.energyspeed import getAvgEnergy
 import modes.visualization.dsp as dsp
 from tools.fps import frames_per_second
 from tools.timer import setPrevTime
-from tools.tools import getDeltaTime
+from tools.tools import getDeltaTime, clamp
 import modes.visualization.microphone as microphone
 import httpserver.currVars as currVars
 import modes.visualization.visualization as visualization
@@ -95,8 +95,6 @@ def micCheck(is_vis: bool):
         microphone.stop()
 
 
-
-
 def main():
     prev_fps_update = time.time()
     i = 0
@@ -106,7 +104,7 @@ def main():
     isEnergyBrightness = currVars.getConfig("energy_brightness")
     energyBrightnessMult = currVars.getConfig("energy_brightness_mult")
     energySensitivity = currVars.getConfig("energy_sensitivity")
-    energy_filt = dsp.ExpFilter(1, alpha_decay=energySensitivity, alpha_rise=0.99)
+    energy_filt = dsp.ExpFilter(1, alpha_decay=clamp(0.00000001, energySensitivity, .99), alpha_rise=0.99)
 
     micCheck(isVisualizer or isEnergyBrightness or isEnergySpeed)
 

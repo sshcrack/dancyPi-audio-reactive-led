@@ -10,6 +10,7 @@ from threading import Thread
 import config
 from config import N_PIXELS
 from tools.fps import frames_per_second
+from tools.tools import clamp
 
 pixels = np.tile(1, (3, N_PIXELS))
 
@@ -23,15 +24,6 @@ def update(p: np.ndarray):
     global pixels, fps_update
     pixels = p
     fps_update = frames_per_second()
-
-
-def clamp(min_numb: int, value: int, max_numb: int):
-    if value < min_numb:
-        return min_numb
-    if value > max_numb:
-        return max_numb
-
-    return value
 
 
 def guiThread():
