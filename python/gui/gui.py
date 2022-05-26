@@ -1,19 +1,28 @@
+import math
+import random
+import time
+
+import mpmath
 import pygame
 import numpy as np
-import sys
 from threading import Thread
 
+import config
 from config import N_PIXELS
+from tools.fps import frames_per_second
 
 pixels = np.tile(1, (3, N_PIXELS))
 
 shouldRun = True
 exitSignal = False
 
+fps_update = frames_per_second()
+
 
 def update(p: np.ndarray):
-    global pixels
+    global pixels, fps_update
     pixels = p
+    fps_update = frames_per_second()
 
 
 def clamp(min_numb: int, value: int, max_numb: int):
@@ -26,7 +35,7 @@ def clamp(min_numb: int, value: int, max_numb: int):
 
 
 def guiThread():
-    global exitSignal, shouldRun
+    global exitSignal, shouldRun, fps_update
     clock = pygame.time.Clock()
     pygame.init()
     screen = pygame.display.set_mode((500, 500), pygame.RESIZABLE)
@@ -35,8 +44,7 @@ def guiThread():
     font = pygame.font.SysFont("Arial", 18)
 
     def update_fps():
-        fps = str(int(clock.get_fps()))
-        fps_text = font.render(fps, 1, pygame.Color("coral"))
+        fps_text = font.render(str(round(fps_update)), True, pygame.Color("coral"))
         return fps_text
 
     while shouldRun:
@@ -57,9 +65,10 @@ def guiThread():
             pos = (xStart, y, xEnd, y + height)
             pygame.draw.rect(screen, [r, g, b], pygame.Rect(pos))
 
+        pygame.draw.rect(screen, [random.random() * 255, random.random() * 255, random.random() * 255], pygame.Rect((0, 0, 10, 10)))
         screen.blit(update_fps(), (10, 0))
         pygame.display.flip()
-        clock.tick(60)
+        clock.tick(150)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:

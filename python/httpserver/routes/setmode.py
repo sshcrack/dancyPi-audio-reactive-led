@@ -4,10 +4,11 @@ from data import modeKeys, modes
 
 from httpserver.currVars import setConfig, setMode
 
+
 def onSetMode(server: BaseHTTPRequestHandler, params: List[str]):
     mode_str = params.get("mode")
 
-    if mode_str != None and len(mode_str) != 0:
+    if mode_str is not None and len(mode_str) != 0:
         mode_str = mode_str[0]
 
     if mode_str not in modeKeys:
@@ -18,7 +19,7 @@ def onSetMode(server: BaseHTTPRequestHandler, params: List[str]):
 
     mode = modes[mode_str]
     required_vars = mode["required_vars"]
-    
+
     if type(required_vars) is dict:
         usual_prefix = f"{mode_str}_"
 
@@ -33,16 +34,16 @@ def onSetMode(server: BaseHTTPRequestHandler, params: List[str]):
 
             if "error" in res_keys:
                 return (400,
-                {
-                    "error": res["error"]
-                })
+                        {
+                            "error": res["error"]
+                        })
 
             if "result" not in res_keys:
                 return (500,
-                {
-                    "error": f"Validate function mode {mode_str} with key {key} did not return any value"
-                })
-            
+                        {
+                            "error": f"Validate function mode {mode_str} with key {key} did not return any value"
+                        })
+
             setConfig(key, res["result"])
             print("Setting", key, "to", res["result"])
 

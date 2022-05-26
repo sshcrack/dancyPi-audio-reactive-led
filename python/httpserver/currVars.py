@@ -133,8 +133,11 @@ def getGradient():
     return data["hex_gradient"]
 
 
-def getConfig(key: str):
+def getConfig(key: str, default=None):
     global data
+    if default is not None and key not in data.keys():
+        return default
+
     return data.get(key)
 
 

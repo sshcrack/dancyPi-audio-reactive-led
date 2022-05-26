@@ -9,17 +9,19 @@ export default function EnergyComp({ onChange, stored }: EnergyMeterProps) {
     const sensitivityVar: Var = {
         name: "energy_sensitivity",
         type: "float",
-        max: 50,
+        max: 1,
         min: 0
     }
 
     const brightnessVar: Var = {
         ...sensitivityVar,
         name: "energy_brightness_mult",
+        max: 10
     }
 
     const speedVar: Var = {
         ...sensitivityVar,
+        max: 10,
         name: "energy_speed_mult"
     }
 

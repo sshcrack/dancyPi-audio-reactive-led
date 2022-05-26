@@ -8,7 +8,7 @@ import modes.full
 import modes.stack
 import modes.scanner
 
-from tools.validators import validate_float, validate_int
+from tools.validators import validate_float, validate_int, validate_bool
 from httpserver.currVars import getFilterMode
 
 required_parsable = ["min", "max", "type", "sug_min", "sug_max"]
@@ -31,7 +31,12 @@ modes = {
         "func": visualization.visualize_energy,
         "visualizer": True,
         "filters": True,
-        "required_vars": {}
+        "required_vars": {
+            "energy_mirror": {
+                "type": "boolean",
+                "func": validate_bool("mirror")
+            }
+        }
     },
     "full": {
         "func": modes.full.full,

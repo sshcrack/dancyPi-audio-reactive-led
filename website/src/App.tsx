@@ -264,7 +264,7 @@ async function saveOuter(available: AvailableData | undefined, stored: StoredDat
   const filterQueries = getQueryParams(strFilter, currFilter.vars, stored)
   const energyQuery = getEnergyQuery(stored)
 
-  const anyErrors = modeQueries.some(e => !e) || filterQueries.some(e => !e)
+  const anyErrors = modeQueries.some(e => (!e && typeof e !== "boolean") || typeof e === "undefined") || filterQueries.some(e => !e)
   if (anyErrors) {
     console.error(filterQueries, modeQueries, stored, currMode, currFilter)
     return toast({
@@ -311,11 +311,13 @@ async function saveOuter(available: AvailableData | undefined, stored: StoredDat
 }
 
 function getQueryParams(prefix: string, vars: Var[], stored: StoredData) {
+  console.log("Query Params")
   return vars.map(({ name }) => {
     const storedKey = `${prefix}_${name}`
     let value = stored[storedKey]
 
-    if (!value || !name)
+    console.log(storedKey, value)
+    if (typeof value === "undefined" || typeof name === "undefined")
       return undefined
 
     if (typeof value === "object")
@@ -339,7 +341,7 @@ function getEnergyQuery(stored: StoredData) {
 
 function getBaseUrl(location: Location) {
   const { protocol, host } = location
-  return `${protocol}//${host/*"localhost:6789"*/}`
+  return `${protocol}//${/*host*/"localhost:6789"}`
 }
 
 type ChangeFunc = (newMode: string) => void

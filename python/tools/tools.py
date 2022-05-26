@@ -66,5 +66,9 @@ def check_int(potential_int):
         return False
 
 
+def check_bool(potential_bool: str):
+    return potential_bool.lower() == "true" or potential_bool.lower() == "false"
+
+
 def isColorHex(s: str):
     return re.search(r'^#(?:[0-9a-fA-F]{3}){1,2}$', str(s))

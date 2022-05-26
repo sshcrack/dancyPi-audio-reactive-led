@@ -13,7 +13,8 @@ export default function GeneralComp({ data: mode, onStoredChange, stored }: Comp
         if (!Object.keys(typeComponents).includes(type))
             return <p>Type {type} not found</p>
 
-        const Comp = typeComponents[type as ComponentTypes]
+        console.log("Type", type)
+        const Comp = typeComponents[type as ComponentTypes] as any
         if (!Comp)
             return <p>Type {type} not found</p>
 

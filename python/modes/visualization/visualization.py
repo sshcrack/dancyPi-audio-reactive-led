@@ -9,6 +9,7 @@ from scipy.ndimage.filters import gaussian_filter1d
 
 import config
 import modes.visualization.dsp as dsp
+from httpserver.currVars import getConfig
 
 
 def memoize(function):
@@ -98,6 +99,8 @@ def visualize_scroll(mel):
 def visualize_energy(mel):
     """Effect that expands from the center with increasing sound energy"""
     global p
+    mirror = getConfig("energy_mirror", True)
+
     mel = np.copy(mel)
     gain.update(mel)
     mel /= gain.value
@@ -121,8 +124,14 @@ def visualize_energy(mel):
     p[0, :] = gaussian_filter1d(p[0, :], sigma=4.0)
     p[1, :] = gaussian_filter1d(p[1, :], sigma=4.0)
     p[2, :] = gaussian_filter1d(p[2, :], sigma=4.0)
-    # Set the new pixel value
-    return np.concatenate((p[:, ::-1], p), axis=1)
+
+    if mirror:
+        return np.concatenate((p[:, ::-1], p), axis=1)
+    else:
+        r_l = interpolate(p[0], config.N_PIXELS)
+        g_l = interpolate(p[1], config.N_PIXELS)
+        b_l = interpolate(p[2], config.N_PIXELS)
+        return np.array([r_l, g_l, b_l])
 
 
 _prev_spectrum = np.tile(0.01, config.N_PIXELS // 2)
