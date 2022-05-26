@@ -341,7 +341,7 @@ function getEnergyQuery(stored: StoredData) {
 
 function getBaseUrl(location: Location) {
   const { protocol, host } = location
-  return `${protocol}//${/*host*/"localhost:6789"}`
+  return `${protocol}//${host}`
 }
 
 type ChangeFunc = (newMode: string) => void
