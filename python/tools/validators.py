@@ -1,4 +1,4 @@
-from tools.tools import check_float, check_int, check_bool
+from tools.tools import check_float, checkInt, check_bool
 
 
 def validate_int(param_name: str, min_val=None, max_val=None):
@@ -10,7 +10,7 @@ def validate_int(param_name: str, min_val=None, max_val=None):
             }
 
         param = param[0]
-        if not check_int(param):
+        if not checkInt(param):
             return {
                 "error": f"{param_name} has to be an integer",
                 "result": None

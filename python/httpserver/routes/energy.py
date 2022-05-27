@@ -2,7 +2,7 @@ from http.server import BaseHTTPRequestHandler
 from typing import List
 
 from httpserver.currVars import setConfig
-from tools.tools import check_float, check_int
+from tools.tools import check_float, checkInt
 
 
 def onEnergy(_server: BaseHTTPRequestHandler, params: List[str]):

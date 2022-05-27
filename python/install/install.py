@@ -8,7 +8,7 @@ sys.path.append('..')
 
 import os
 from os import path
-from tools.tools import check_int
+from tools.tools import checkInt
 from json import dumps
 from shutil import copy2
 
@@ -106,7 +106,7 @@ def number_input(question: str, optional = False, default=None):
         if optional and len(out_str.replace(" ", "")) == 0:
             break
 
-        if check_int(out_str):
+        if checkInt(out_str):
             out = int(out_str)
             break
         else:

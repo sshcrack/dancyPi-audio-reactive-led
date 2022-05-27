@@ -29,12 +29,12 @@ def wheel(pos):
         return [0, pos * 3, 255 - pos * 3]
 
 
-def getDeltaTime(currTime: Optional[float] = None):
+def getDeltaTime(curr_time: Optional[float] = None):
     _time_prev = getPrevTime()
-    if currTime is None:
-        currTime = time()
+    if curr_time is None:
+        curr_time = time()
 
-    return currTime - _time_prev
+    return curr_time - _time_prev
 
 
 def check_int(potential_int: str):
@@ -56,7 +56,7 @@ def check_float(potential_float):
         return False
 
 
-def check_int(potential_int):
+def checkInt(potential_int):
     try:
         int(potential_int)
         return True

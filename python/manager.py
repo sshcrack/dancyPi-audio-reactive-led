@@ -104,7 +104,7 @@ def main():
     isEnergyBrightness = currVars.getConfig("energy_brightness")
     energyBrightnessMult = currVars.getConfig("energy_brightness_mult")
     energySensitivity = currVars.getConfig("energy_sensitivity")
-    energy_filt = dsp.ExpFilter(1, alpha_decay=clamp(0.00000001, energySensitivity, .99), alpha_rise=0.99)
+    energy_filter = dsp.ExpFilter(1, alpha_decay=clamp(0.00000001, energySensitivity, .99), alpha_rise=0.99)
 
     micCheck(isVisualizer or isEnergyBrightness or isEnergySpeed)
 
@@ -130,7 +130,7 @@ def main():
             if newSense != energySensitivity:
                 energySensitivity = newSense
                 print(f"Updating energy filter with sense {newSense}...")
-                energy_filt = dsp.ExpFilter(1, alpha_decay=newSense, alpha_rise=0.99)
+                energy_filter = dsp.ExpFilter(1, alpha_decay=newSense, alpha_rise=0.99)
             micCheck(isVisualizer or isEnergyBrightness or isEnergySpeed)
             multiplier = currVars.getMultiplier()
             i = 0
@@ -144,7 +144,7 @@ def main():
                 funcOut = func(mel)
                 setPrevTime()
             else:
-                energy = energy_filt.update(getAvgEnergy(mel))
+                energy = energy_filter.update(getAvgEnergy(mel))
                 currVars.setConfig("energy_curr", energy)
 
         if not isVisualizer:
