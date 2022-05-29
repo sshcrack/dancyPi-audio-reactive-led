@@ -4,10 +4,8 @@ from __future__ import division
 
 import os
 
-DEVICE = 'pi'
-
-PORT=6789
-BIND_ADDRESS='0.0.0.0'
+PORT = 6789
+BIND_ADDRESS = '0.0.0.0'
 
 """Device used to control LED strip. Must be 'pi',  'esp8266' or 'blinkstick'
 'esp8266' means that you are using an ESP8266 module to control the LED strip
@@ -19,47 +17,11 @@ to control the leds connected to it.
 """
 
 
-STATUS_LED_PIN = 4
-"""Pin of the status led to use"""
-
 GESTURE_SENSOR_ENABLED = False
-"""Weither a Groove Gesture Sensor is connected to the pi"""
-
-if DEVICE == 'esp8266':
-    UDP_IP = '192.168.0.150'
-    """IP address of the ESP8266. Must match IP in ws2812_controller.ino"""
-    UDP_PORT = 7777
-    """Port number used for socket communication between Python and ESP8266"""
-    SOFTWARE_GAMMA_CORRECTION = False
-    """Set to False because the firmware handles gamma correction + dither"""
-
-if DEVICE == 'pi':
-    LED_PIN = 18
-    """GPIO pin connected to the LED strip pixels (must support PWM)"""
-    LED_FREQ_HZ = 800000
-    """LED signal frequency in Hz (usually 800kHz)"""
-    LED_DMA = 5
-    """DMA channel used for generating PWM signal (try 5)"""
-    BRIGHTNESS = 255
-    """Brightness of LED strip between 0 and 255"""
-    LED_INVERT = False
-    """Set True if using an inverting logic level converter"""
-    SOFTWARE_GAMMA_CORRECTION = True
-    """Set to True because Raspberry Pi doesn't use hardware dithering"""
-
-if DEVICE == 'blinkstick':
-    SOFTWARE_GAMMA_CORRECTION = True
-    """Set to True because blinkstick doesn't use hardware dithering"""
+"""Whether a Groove Gesture Sensor is connected to the pi"""
 
 
-LED_PIN = 18
-"""GPIO pin connected to the LED strip pixels (must support PWM)"""
-
-N_PIXELS = 500
-"""Number of pixels in the LED strip"""
-
-
-GAMMA_TABLE_PATH = os.path.join(os.path.dirname(__file__), 'modes', 'visualization', 'gamma_table.npy')
+GAMMA_TABLE_PATH = os.path.join(os.path.dirname(__file__), 'base', 'visualization', 'gamma_table.npy')
 """Location of the gamma correction table"""
 
 MIC_RATE = 48000
@@ -83,8 +45,9 @@ appear "sluggish" or out of sync with the audio being played if it is too low.
 The FPS should not exceed the maximum refresh rate of the LED strip, which
 depends on how long the LED strip is.
 """
-_max_led_FPS = int(((N_PIXELS * 30e-6) + 50e-6)**-1.0)
-assert FPS <= _max_led_FPS, 'FPS must be <= {}'.format(_max_led_FPS)
+#TODO
+# _max_led_FPS = int(((N_PIXELS * 30e-6) + 50e-6)**-1.0)
+# assert FPS <= _max_led_FPS, 'FPS must be <= {}'.format(_max_led_FPS)
 
 MIN_FREQUENCY = 200
 """Frequencies below this value will be removed during audio processing"""

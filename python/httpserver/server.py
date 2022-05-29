@@ -1,22 +1,23 @@
-from http.server import HTTPServer, BaseHTTPRequestHandler, SimpleHTTPRequestHandler
+from http.server import HTTPServer, BaseHTTPRequestHandler
 import json
 from config import BIND_ADDRESS, PORT
 from os import path
 from socketserver import ThreadingMixIn
 from threading import Thread
 from urllib.parse import parse_qs, urlparse
-from httpserver.routes.available import onAvailable
-from httpserver.routes.enabled import onEnabled
-from httpserver.routes.energy import onEnergy
-from httpserver.routes.locked import onLocked
-from httpserver.routes.multiplier import onMultiplier
-from httpserver.routes.setmode import onSetMode
-from httpserver.routes.filter import onFilter
-from httpserver.routes.setspeed import onSetSpeed
-from httpserver.routes.vars import onVars
+from httpserver.api.routes.available import onAvailable
+from httpserver.api.routes.enabled import onEnabled
+from httpserver.api.routes.energy import onEnergy
+from httpserver.api.routes.locked import onLocked
+from httpserver.api.routes.multiplier import onMultiplier
+from httpserver.api.routes.setmode import onSetMode
+from httpserver.api.routes.filter import onFilter
+from httpserver.api.routes.setspeed import onSetSpeed
+from httpserver.api.routes.vars import onVars
 import mimetypes
 
-from interfaces import getIPs
+from tools.interfaces import getIPs
+
 
 
 def run_server():

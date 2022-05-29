@@ -20,7 +20,7 @@ elif config.DEVICE == 'blinkstick':
 
     from blinkstick import blinkstick
 
-    #Will turn all leds off when invoked.
+    # Will turn all leds off when invoked.
     def signal_handler(signal, frame):
         all_off = [0]*(config.N_PIXELS*3)
         stick.set_led_data(0, all_off)
