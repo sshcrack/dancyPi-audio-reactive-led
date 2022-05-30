@@ -49,7 +49,7 @@ def onFilter(controller: "GeneralController", params: List[str]):
             
             config.set(key, res["result"])
             print("Setting", key, "to", res["result"])
-            config.set("filter_mode", filter_str)
+    config.set("filter_mode", filter_str)
 
     return (200, {
         "success": True,

@@ -6,6 +6,7 @@ from scipy.ndimage.filters import gaussian_filter1d
 
 import config
 import base.visualization.dsp as dsp
+from customLogger.log import getLogger
 
 frames_per_buffer = int(config.MIC_RATE / config.FPS)
 stream: pyaudio.Stream = None
@@ -13,9 +14,12 @@ p: pyaudio.PyAudio = None
 
 overflows = 0
 prev_ovf_time = time.time()
+logger = getLogger("Microphone")
 
 
 def start():
+    logger.info("Starting Microphone")
+
     global stream, p
     if stream is not None or p is not None:
         return False
@@ -43,7 +47,7 @@ def read():
         overflows += 1
         if time.time() > prev_ovf_time + 1:
             prev_ovf_time = time.time()
-            print('Audio buffer has overflowed {} times'.format(overflows))
+            logger.warn('Audio buffer has overflowed {} times'.format(overflows))
 
         return []
 
@@ -52,9 +56,9 @@ def stop():
     global stream, p
 
     if stream is None:
-        return print("Stream is None.")
+        return logger.warn("Trying to stop, but stream is None.")
 
-    print("Closing stream.")
+    logger.info("Stopping microphone")
     stream.stop_stream()
     stream.close()
     p.terminate()

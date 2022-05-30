@@ -1,23 +1,35 @@
 from prodict import Prodict
 from os import path, getcwd
 import json
+from typing import Optional
 
 
 class GeneralLEDConfig(Prodict):
-    DEVICE_NAME: str
+    DEVICE: str
     N_PIXELS: int
-    SOFTWARE_GAMMA_CORRECTION = False
-    enabled = True
+    CONTROLLER: str
+    SOFTWARE_GAMMA_CORRECTION: Optional[bool]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.SOFTWARE_GAMMA_CORRECTION = False
 
 
 class RPIConfig(GeneralLEDConfig):
     LED_PIN: int
-    N_PIXELS: int
-    LED_FREQ_HZ = 800000
-    LED_DMA = 5
-    LED_INVERT = False
-    BRIGHTNESS = 255
-    SOFTWARE_GAMMA_CORRECTION = True
+    LED_FREQ_HZ: Optional[int]
+    LED_DMA: Optional[int]
+    LED_INVERT: Optional[bool]
+    BRIGHTNESS: Optional[int]
+    SOFTWARE_GAMMA_CORRECTION: Optional[bool]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.SOFTWARE_GAMMA_CORRECTION = True
+        self.BRIGHTNESS = 255
+        self.LED_INVERT = False
+        self.LED_DMA = 5
+        self.LED_FREQ_HZ = 800000
 
 
 class ESPConfig(GeneralLEDConfig):
@@ -44,3 +56,10 @@ def loadDeviceConfig(devId: str) -> GeneralLEDConfig:
     f.close()
 
     return Prodict.from_dict(json.loads(raw))
+
+
+ConfigMappings = {
+    "pi": RPIConfig,
+    "esp8266": ESPConfig,
+    "blinkstick": BlinkstickConfig
+}

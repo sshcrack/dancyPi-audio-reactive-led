@@ -1,7 +1,8 @@
 import json
 import sys
 from http.server import BaseHTTPRequestHandler
-from httpserver.server import ThreadedHTTPServer
+
+from httpserver.base import ThreadedHTTPServer
 from tools.interfaces import getIPs
 from threading import Thread
 from urllib.parse import parse_qs, urlparse
@@ -18,6 +19,18 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from base.controller import GeneralController
+
+AVAILABLE_ROUTES = [
+    "setmode",
+    "enabled",
+    "locked",
+    "speed",
+    "filter",
+    "multiplier",
+    "energy",
+    "vars",
+    "available"
+]
 
 
 class APIServerHandler(BaseHTTPRequestHandler):
@@ -76,36 +89,39 @@ class APIServer:
         self.thread = None
         self.address = None
         self.port = None
-
-    def serveThreaded(self, address: str, port: int):
-        if self.thread is not None:
-            print(f"APIServer for controller {self.controller.deviceId} already running")
-            return
-
-        self.address = address
-        self.port = port
-        self.thread = Thread(target=lambda: self.serve(address, port))
-        self.thread.start()
+        self.httpd = None
 
     def serve(self, address: str, port: int):
+        if self.httpd is not None:
+            print("HTTP Server already running. Returning")
+            return
+
         httpd = ThreadedHTTPServer((address, port),
-                                   lambda *_: APIServerHandler(self.controller, *_, directory=sys.path[0]))
+                                   lambda *_: APIServerHandler(self.controller, *_))
 
         print("Getting ips...")
         ips = getIPs()
         last_addr = ".".join(address.split(".")[:-1])
 
-        matching_ips = ips
-        if address != "0.0.0.0":
+        if address == "0.0.0.0":
             matching_ips = ["127.0.0.1"]
             for ip in ips:
                 if last_addr in ip:
                     matching_ips.append(ip)
+        else:
+            matching_ips = [address]
 
         print(f"API-Server[{self.controller.deviceId}] started listening on")
-        for ip in ips:
+        for ip in matching_ips:
             print(f"    http://{ip}:{port}")
 
         self.address = address
         self.port = port
-        httpd.serve_forever()
+        self.httpd = httpd
+        self.thread = Thread(target=httpd.serve_forever)
+        self.thread.start()
+
+    def shutdown(self):
+        print(f"Shutting down API Server for {self.controller.deviceId}")
+        self.httpd.shutdown()
+        self.thread.join()

@@ -35,11 +35,11 @@ class RainbowMode(GeneralMode):
 
     def run(self, data):
         r, g, b = data
-        speed = self.config.get("rainbow_speed")
+        speed = self.config.get("rainbow_speed", 1)
         if speed is None:
             speed = self.config.getGeneralSpeed()
 
-        deltaTime = tools.getDeltaTime()
+        deltaTime = self.timer.getDelta()
 
         for i in range(len(r)):
             maxVal = getMax([r[i], g[i], b[i]])

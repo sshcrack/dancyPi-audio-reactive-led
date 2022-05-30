@@ -1,3 +1,6 @@
+import os
+import threading
+import traceback
 from typing import Any, Dict
 
 from time import time
@@ -6,6 +9,7 @@ import numpy as np
 
 import config
 from base.hardware.configDict import loadDeviceConfig
+from customLogger.log import getLogger
 from httpserver.api.apiServer import APIServer
 from tools.interfaces import find_free_port
 from tools.nparray import multipleIntArr
@@ -25,8 +29,8 @@ from base.GeneralMode import GeneralMode
 from base.GeneralFilter import GeneralFilter
 from base.filters.rainbow import RainbowMode
 
-defaultMode = "normal"
-defaultFilter = "full"
+defaultMode = "full"
+defaultFilter = "normal"
 
 defaultModes = {
     "full": FullMode
@@ -45,6 +49,7 @@ class GeneralController:
     deviceId: str
     timer = Timer()
     initialized = False
+    shouldExit = False
     modes: Dict[str, GeneralMode] = {}
     filters: Dict[str, GeneralFilter] = {}
 
@@ -55,12 +60,13 @@ class GeneralController:
             configDefaults = {}
 
         self.deviceId = deviceId
+        self.logger = getLogger("GeneralController", deviceId)
         self.device = loadDeviceConfig(deviceId)
         self.config = ConfigManager(deviceId, configDefaults)
-        self.enabled = self.device.enabled
+        self.enabled = self.config.get("enabled")
 
         if not microphone.isRunning():
-            print("Starting microphone service...")
+            self.logger.info("Starting microphone service...")
             microphone.start()
 
         self.energySense = clamp(0.0001, self.config.get("energy_sensitivity", .99), .99)
@@ -78,15 +84,19 @@ class GeneralController:
         self.constructorFilters = {**defaultFilters, **filters}
 
         for keyMode in list(self.constructorModes.keys()):
+            self.logger.debug(f"Loading mode {keyMode}...")
             self.modes[keyMode] = self.constructorModes[keyMode](self)
 
         for keyFilter in list(self.constructorFilters.keys()):
+            self.logger.debug(f"Loading filter {keyFilter}...")
             self.filters[keyFilter] = self.constructorFilters[keyFilter](self)
 
         self.pixels = np.tile(1, (3, self.device.N_PIXELS))
 
-        self.currMode = defaultMode
-        self.currFilter = defaultFilter
+        self.currMode = self.config.getMode()
+        if self.currMode is None:
+            self.currMode = defaultMode
+        self.currFilter = self.config.get("filter_mode", defaultFilter)
         # How far to enable animation state has proceeded. 1 = normal, 0 = off
         self.currEnableAnimationState = 1.0
         self.prev_fps_update = time()
@@ -94,38 +104,55 @@ class GeneralController:
         try:
             self.led = LEDManager(self.device)
         except ImportError as e:
-            print(f"Could not load LEDManager. Disabling leds.")
-            print(e)
+            self.logger.warn(f"Could not load LEDManager. Disabling leds.")
+            traceback.print_exc()
+            self.led = None
+        except RuntimeError as e:
+            self.logger.warn(f"LEDManager could not be loaded. Device is not enabled")
+            traceback.print_exc()
             self.led = None
 
         if gui:
             try:
                 self.gui = GUIManager(self.device, deviceId)
             except Exception as e:
-                print(f"Could not start GUI Manager. Disabling...")
-                print(e)
+                self.logger.warn(f"Could not start GUI Manager. Disabling...")
+                traceback.print_exc()
                 self.gui = None
 
         if self.gui is None and self.led is None:
             raise ValueError("Neither GUI nor LEDS could be loaded. Stopping.")
 
         self.api = APIServer(self)
-        self.api.serveThreaded("127.0.0.1", find_free_port())
+        self.api.serve("127.0.0.1", find_free_port())
 
     def shutdown(self):
-        print("Shutting down with id", self.deviceId)
+        self.logger.info("Shutting down")
         microphone.stop()
         self.config.save()
+        if self.led is not None:
+            self.led.stop(self.pixels)
+        if self.gui is not None:
+            self.gui.shouldRun = False
+        self.api.shutdown()
 
     def updateVars(self):
+        self.enabled = self.config.get("enabled")
         self.energySense = self.config.get("energy_sensitivity", .99)
         self.isEnergySpeed = self.config.get("energy_speed", False)
         self.isEnergyBrightness = self.config.get("energy_brightness", False)
         self.energyBrightnessMult = self.config.get("energy_brightness_mult", 1)
+        self.currMode = self.config.getMode()
+        if self.currMode is None:
+            self.currMode = defaultMode
+        self.currFilter = self.config.get("filter_mode", defaultFilter)
 
     def run(self):
         if round(time()) % 3 == 0:
+            if self.gui is not None and self.gui.exitSignal:
+                self.shouldExit = True
             self.updateVars()
+
         if not self.enabled and self.currEnableAnimationState == 0:
             self.pixels *= 0
             self.updateLeds()
@@ -142,22 +169,25 @@ class GeneralController:
                 outPixels = self.calculateEnergyBrightness(outPixels, energy)
 
         outPixels = self.applyEnableAnimation(outPixels)
+        outPixels = self.postProcessPixels(outPixels)
         self.pixels = outPixels
-        self.updateLeds()
+        th = threading.Thread(target=self.updateLeds)
+        th.start()
 
         if config.DISPLAY_FPS:
             fps = frames_per_second()
             if time() - 0.5 > self.prev_fps_update:
                 self.prev_fps_update = time()
-                print("Dev" + self.deviceId + ' FPS {:.0f} / {:.0f}'.format(fps, config.FPS))
+                self.logger.debug('] FPS {:.0f} / {:.0f}'.format(fps, config.FPS))
+
+    def postProcessPixels(self, data: np.ndarray):
+        return data
 
     def updateLeds(self):
         if self.led is not None:
             self.led.update(self.pixels)
         if self.gui is not None:
             self.gui.update(self.pixels)
-            if self.gui.exitSignal:
-                raise Exception("Exit by GUI")
 
     def applyEnableAnimation(self, outPixels: np.ndarray):
         delta = self.timer.getDelta()
@@ -185,14 +215,14 @@ class GeneralController:
             raw = microphone.read()
             mel = microphone.microphone_update(raw)
             if isVisualizer:
-                modePixelsOut = modeFunc(mel, self)
+                modePixelsOut = modeFunc(mel)
             else:
                 avgEnergy = getAvgEnergy(mel)
                 energy = self.energy_filter.update(avgEnergy)
                 self.config.set("energy_curr", energy)
 
         if not isVisualizer:
-            modePixelsOut = modeFunc(None, self)
+            modePixelsOut = modeFunc(None)
         self.timer.update()
 
         return energy, modePixelsOut

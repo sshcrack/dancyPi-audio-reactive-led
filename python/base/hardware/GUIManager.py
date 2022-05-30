@@ -28,17 +28,20 @@ class GUIManager:
         self.fps_update = frames_per_second()
 
     def guiThread(self):
+        print(f"GUI thread running with id {self.deviceId}")
         clock = pygame.time.Clock()
         pygame.init()
 
+        print("Initializing done. Loading fonts...")
         screen = pygame.display.set_mode((500, 500), pygame.RESIZABLE)
         pygame.display.set_caption(f"LED {self.deviceId}")
 
-        font = pygame.font.SysFont("Arial", 10)
+        font = pygame.font.SysFont("Calibri", 10)
 
         def update_fps():
             return font.render(str(round(self.fps_update)), True, pygame.Color("coral"))
 
+        print("While Loop of GUI Thread")
         while self.shouldRun:
             screen.fill((0, 0, 0))
             width = screen.get_width()
@@ -57,7 +60,6 @@ class GUIManager:
                 pos = (xStart, y, xEnd, y + height)
                 pygame.draw.rect(screen, [r, g, b], pygame.Rect(pos))
 
-            pygame.draw.rect(screen, [random() * 255, random() * 255, random() * 255], pygame.Rect((0, 0, 10, 10)))
             screen.blit(update_fps(), (10, 0))
             pygame.display.flip()
             clock.tick(144)
@@ -67,3 +69,4 @@ class GUIManager:
                     pygame.quit()
                     self.exitSignal = True
                     self.shouldRun = False
+        pygame.quit()

@@ -1,9 +1,13 @@
+import traceback
+
 import numpy as np
 
 import config as globalConfig
 import socket
 from base.hardware.configDict import *
+from customLogger.log import getLogger
 
+logger = getLogger("LEDManager")
 blinkstickAvailable = False
 try:
     import signal
@@ -12,14 +16,16 @@ try:
     from blinkstick import blinkstick
     blinkstickAvailable = True
 except ImportError as e:
-    print(e)
-    print("Could not import blinkstick, 'blinkstick' as device can not be used")
+    traceback.print_exc()
+    logger.warn("Could not import blinkstick, 'blinkstick' as device can not be used")
 
+rpiAvailable = False
 try:
     from rpi_ws281x import *
+    rpiAvailable = True
 except ImportError as e:
-    print(e)
-    print("Could not import rpi_ws281x, 'pi' as device wont be available")
+    traceback.print_exc()
+    logger.warn("Could not import rpi_ws281x, 'pi' as device wont be available")
 
 
 _gamma = np.load(globalConfig.GAMMA_TABLE_PATH)
@@ -36,8 +42,10 @@ class LEDManager:
         self.pixels = np.tile(1, (3, config.N_PIXELS))
         """Pixel values for the LED strip"""
 
-        dev = self.config.device
+        dev = self.config.DEVICE
         if dev == "blinkstick":
+            if not blinkstickAvailable:
+                raise RuntimeError("Blinkstick not enabled. Look at log to fix")
 
             # Will turn all leds off when invoked.
             def signal_handler(signal, frame):
@@ -50,6 +58,8 @@ class LEDManager:
             signal.signal(signal.SIGTERM, signal_handler)
             signal.signal(signal.SIGINT, signal_handler)
         elif dev == "pi":
+            if not rpiAvailable:
+                raise RuntimeError("RPI Device not enabled. Look at log to fix")
             self.strip = Adafruit_NeoPixel(config.N_PIXELS, config.LED_PIN,
                                            config.LED_FREQ_HZ, config.LED_DMA,
                                            config.LED_INVERT, config.BRIGHTNESS)
@@ -152,7 +162,7 @@ class LEDManager:
         self.strip.show()
 
     def update(self, pixels: np.ndarray):
-        dev = self.config.device
+        dev = self.config.DEVICE
         self.pixels = pixels
 
         if dev == "esp8266":

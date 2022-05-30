@@ -11,6 +11,7 @@ from tools.validators import validate_int
 
 class ChunkMode(GeneralMode):
     def __init__(self, controller: GeneralController):
+        dev = controller.device
         super().__init__({
             "chunk_chunks": 4
         }, {
@@ -19,20 +20,20 @@ class ChunkMode(GeneralMode):
             "required_vars": {
                 "chunk_chunks": {
                     "sug_min": 1,
-                    "sug_max": self.device.N_PIXELS,
-                    "func": validate_int("chunks", 1, self.device.N_PIXELS),
+                    "sug_max": dev.N_PIXELS,
+                    "func": validate_int("chunks", 1, dev.N_PIXELS),
                     "type": "int",
                     "min": 0
                 }
             }
         }, controller)
-        self._prev_spectrum = np.tile(0.01, self.device.N_PIXELS // 2)
-        self.common_mode = dsp.ExpFilter(np.tile(0.01, self.device.N_PIXELS // 2),
+        self._prev_spectrum = np.tile(0.01, dev.N_PIXELS // 2)
+        self.common_mode = dsp.ExpFilter(np.tile(0.01, dev.N_PIXELS // 2),
                                          alpha_decay=0.99, alpha_rise=0.01)
 
-        self.r_filt = dsp.ExpFilter(np.tile(0.01, self.device.N_PIXELS // 2),
+        self.r_filt = dsp.ExpFilter(np.tile(0.01, dev.N_PIXELS // 2),
                                     alpha_decay=0.2, alpha_rise=0.99)
-        self.b_filt = dsp.ExpFilter(np.tile(0.01, self.device.N_PIXELS // 2),
+        self.b_filt = dsp.ExpFilter(np.tile(0.01, dev.N_PIXELS // 2),
                                     alpha_decay=0.1, alpha_rise=0.5)
 
     def run(self, mel):

@@ -1,8 +1,5 @@
-from time import time
-from typing import Optional, TypeVar
+from typing import  TypeVar
 import re
-
-from tools.timer import getPrevTime
 
 
 def rgb_to_hex(r, g, b):
@@ -27,14 +24,6 @@ def wheel(pos):
     else:
         pos -= 170
         return [0, pos * 3, 255 - pos * 3]
-
-
-def getDeltaTime(curr_time: Optional[float] = None):
-    _time_prev = getPrevTime()
-    if curr_time is None:
-        curr_time = time()
-
-    return curr_time - _time_prev
 
 
 def check_int(potential_int: str):
