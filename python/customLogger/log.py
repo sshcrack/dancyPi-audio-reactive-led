@@ -1,5 +1,12 @@
 import logging
+import sys
 from typing import List
+
+console = logging.StreamHandler(sys.stdout)
+console.setLevel(logging.DEBUG)
+formatter = logging.Formatter('%(name)-13s: %(levelname)-8s %(message)s')
+console.setFormatter(formatter)
+logging.getLogger().addHandler(console)
 
 
 def getLogger(*args: str):
@@ -10,11 +17,6 @@ def getLogger(*args: str):
         loggerName += args[i]
 
     logger = logging.getLogger(loggerName)
-    logger.setLevel(logging.INFO)
-
-    ch = logging.StreamHandler()
-    ch.setLevel(logging.INFO)
-
-    logger.addHandler(ch)
+    logger.setLevel(logging.DEBUG)
 
     return logger

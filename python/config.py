@@ -27,7 +27,7 @@ GAMMA_TABLE_PATH = os.path.join(os.path.dirname(__file__), 'base', 'visualizatio
 MIC_RATE = 48000
 """Sampling frequency of the microphone in Hz"""
 
-DISPLAY_FPS = False
+DISPLAY_FPS = True
 
 FPS = 50
 """Desired refresh rate of the visualization (frames per second)

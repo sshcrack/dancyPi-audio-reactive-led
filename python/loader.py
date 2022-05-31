@@ -8,6 +8,7 @@ from base.controller import GeneralController
 from controller.ledstrip.ledStripController import LEDStripController
 from threading import Thread
 from base.hardware.configDict import deviceConfigLocation
+from controller.shelf.shelfController import ShelfController
 
 from httpserver.main.server import MainHTTPServer
 
@@ -18,8 +19,10 @@ controllers = {}
 devicesFiles = os.listdir(deviceConfigLocation)
 
 controllerList = [
-    LEDStripController
+    LEDStripController,
+    ShelfController
 ]
+
 
 def runController(controller: GeneralController, devId: str):
     try:

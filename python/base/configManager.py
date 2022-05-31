@@ -42,10 +42,10 @@ class ConfigManager:
 
         self.config_path = path.join(storage_path, f"{storage_id}.json")
         f = None
-        self.logger.debug("Loading from config path", self.config_path)
+        self.logger.debug(f"Loading from config path {self.config_path}")
         self.storage = {**globalVars, **defaults}
         try:
-            self.logger.info("Loading config with id", storage_id)
+            self.logger.info(f"Loading config with id {storage_id}")
             f = open(self.config_path, "r")
             raw = f.read()
             self.storage = {**self.storage, **json.loads(raw)}
@@ -70,7 +70,7 @@ class ConfigManager:
         return self.storage[key]
 
     def set(self, key: str, value: T):
-        self.logger.debug("Setting", key, "to", value)
+        self.logger.debug(f"Setting {key} to {value}")
         self.storage[key] = value
 
     def setGeneralSpeed(self, speed: float):

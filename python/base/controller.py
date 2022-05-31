@@ -112,13 +112,13 @@ class GeneralController:
             traceback.print_exc()
             self.led = None
 
+        self.gui = None
         if gui:
             try:
                 self.gui = GUIManager(self.device, deviceId)
             except Exception as e:
                 self.logger.warn(f"Could not start GUI Manager. Disabling...")
                 traceback.print_exc()
-                self.gui = None
 
         if self.gui is None and self.led is None:
             raise ValueError("Neither GUI nor LEDS could be loaded. Stopping.")

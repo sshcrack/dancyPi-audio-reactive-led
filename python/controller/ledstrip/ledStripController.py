@@ -23,5 +23,8 @@ defaultConfig = {
 
 
 class LEDStripController(GeneralController):
-    def __init__(self, deviceId: str, gui=False):
-        super().__init__(deviceId, modes, filters={}, configDefaults=defaultConfig, gui=gui)
+    def __init__(self, deviceId: str, gui=False, additionalModes=None):
+        if additionalModes is None:
+            additionalModes = {}
+
+        super().__init__(deviceId, {**additionalModes, **modes}, filters={}, configDefaults=defaultConfig, gui=gui)
