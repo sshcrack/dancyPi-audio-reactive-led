@@ -1,3 +1,4 @@
+import sys
 import traceback
 
 import os
@@ -22,6 +23,7 @@ controllerList = [
     LEDStripController,
     ShelfController
 ]
+isGui = "--gui" in sys.argv
 
 
 def runController(controller: GeneralController, devId: str):
@@ -70,7 +72,7 @@ for relativeDevPath in devicesFiles:
         print("Could not find matching controller for", deviceId, "continuing...")
         continue
 
-    c = matching(deviceId, gui=True)
+    c = matching(deviceId, gui=isGui)
     controllers[deviceId] = c
     thread = Thread(target=lambda: runController(c, deviceId))
     threads.append(thread)
