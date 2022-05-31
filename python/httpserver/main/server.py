@@ -152,8 +152,8 @@ class MainHTTPServer:
         if address == "0.0.0.0":
             matching_ips = ["127.0.0.1"]
             for ip in ips:
-                if last_addr in ip:
-                    matching_ips.append(ip)
+                #if last_addr in ip:
+                matching_ips.append(ip)
         else:
             matching_ips = [address]
 
