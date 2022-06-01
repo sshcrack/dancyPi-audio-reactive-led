@@ -51,7 +51,7 @@ class StackMode(GeneralMode):
         stack_speed = config.get("stack_speed")
 
         if self.curr_stack >= max_pixels:
-            curr_stack = 0
+            self.curr_stack = 0
             self.pixel_locations = []
             self.animating_out = True
 
@@ -93,7 +93,7 @@ class StackMode(GeneralMode):
         def getMovePixel(pixel):
             for number in self.pixel_locations:
                 floored = ceil(number)
-                if pixel == floored or floored <= curr_stack + 1:
+                if pixel == floored or floored <= self.curr_stack + 1:
                     return number
             return None
 

@@ -19,7 +19,7 @@ from base.configManager import ConfigManager
 from tools.energyspeed import getAvgEnergy
 import base.visualization.microphone as microphone
 from tools.timer import Timer
-from tools.tools import clamp
+from tools.tools import clamp, timeit
 from base.hardware.GUIManager import GUIManager
 from base.hardware.LEDManager import LEDManager
 from base.modes.full import FullMode
@@ -64,10 +64,6 @@ class GeneralController:
         self.device = loadDeviceConfig(deviceId)
         self.config = ConfigManager(deviceId, configDefaults)
         self.enabled = self.config.get("enabled")
-
-        if not microphone.isRunning():
-            self.logger.info("Starting microphone service...")
-            microphone.start()
 
         self.energySense = clamp(0.0001, self.config.get("energy_sensitivity", .99), .99)
         self.isEnergySpeed = self.config.get("energy_speed", False)
@@ -125,10 +121,18 @@ class GeneralController:
 
         self.api = APIServer(self)
         self.api.serve("127.0.0.1", find_free_port())
+        self.mel = None
+
+        self.micThread = threading.Thread(target=self.measureMicThread)
+        self.micThread.start()
+        self.waitTillThreadMeasures()
 
     def shutdown(self):
+        self.shouldExit = True
         self.logger.info("Shutting down")
-        microphone.stop()
+        self.logger.info("Waiting for mic thread")
+        self.micThread.join()
+        self.logger.info("Continuing")
         self.config.save()
         if self.led is not None:
             self.led.stop(self.pixels)
@@ -171,9 +175,9 @@ class GeneralController:
         outPixels = self.applyEnableAnimation(outPixels)
         outPixels = self.postProcessPixels(outPixels)
         self.pixels = outPixels
-        th = threading.Thread(target=self.updateLeds)
-        th.start()
-
+        #th = threading.Thread(target=self.updateLeds)
+        #th.start()
+        self.updateLeds()
         if config.DISPLAY_FPS:
             fps = frames_per_second()
             if time() - 0.5 > self.prev_fps_update:
@@ -212,12 +216,10 @@ class GeneralController:
 
         shouldReadMicrophone = isVisualizer or self.isEnergyBrightness or self.isEnergySpeed
         if shouldReadMicrophone:
-            raw = microphone.read()
-            mel = microphone.microphone_update(raw)
             if isVisualizer:
-                modePixelsOut = modeFunc(mel)
+                modePixelsOut = modeFunc(self.mel)
             else:
-                avgEnergy = getAvgEnergy(mel)
+                avgEnergy = getAvgEnergy(self.mel, self.device.N_PIXELS)
                 energy = self.energy_filter.update(avgEnergy)
                 self.config.set("energy_curr", energy)
 
@@ -249,3 +251,20 @@ class GeneralController:
             lambda data: filterClass.run(data),
             lambda mel: modeClass.run(mel)
         )
+
+    def measureMicThread(self):
+        if not microphone.isRunning():
+            self.logger.info("Starting microphone service...")
+            microphone.start()
+        while not self.shouldExit:
+            self.mel = self.measureMic()
+
+        microphone.stop()
+
+    def measureMic(self):
+        raw = microphone.read()
+        return microphone.microphone_update(raw)
+
+    def waitTillThreadMeasures(self):
+        while self.mel is None:
+            pass

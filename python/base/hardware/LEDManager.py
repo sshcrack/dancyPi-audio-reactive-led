@@ -106,7 +106,7 @@ class LEDManager:
                 m.append(p[2][i])  # Pixel blue value
             m = bytes(m)
             self._sock.sendto(m, (espConfig.UDP_IP, espConfig.UDP_PORT))
-        _prev_pixels = np.copy(p)
+        self._prev_pixels = np.copy(p)
 
     def _update_blinkstick(self, pixels: np.ndarray):
         """Writes new LED values to the Blinkstick.
@@ -158,7 +158,7 @@ class LEDManager:
                 continue
 
             self.strip._led_data[i] = int(rgb[i])
-        _prev_pixels = np.copy(p)
+        self._prev_pixels = np.copy(p)
         self.strip.show()
 
     def update(self, pixels: np.ndarray):

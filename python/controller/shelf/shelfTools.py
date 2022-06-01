@@ -13,8 +13,8 @@ mappings = [
     [60, 69],
     [102, 120],
 
-    [70, 80],
     [81, 101],
+    [70, 80],
 ]
 
 mappingIntArr = []
@@ -26,6 +26,6 @@ for mapping in mappings:
         mappingIntArr.append(f + x)
     mappingIntArr.append(s)
 
-mappingIntArr
+
 def mappingToIndex(i: int):
     return mappingIntArr[i]

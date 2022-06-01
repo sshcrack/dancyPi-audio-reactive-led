@@ -70,7 +70,6 @@ class ConfigManager:
         return self.storage[key]
 
     def set(self, key: str, value: T):
-        self.logger.debug(f"Setting {key} to {value}")
         self.storage[key] = value
 
     def setGeneralSpeed(self, speed: float):

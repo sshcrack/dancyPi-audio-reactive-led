@@ -4,6 +4,7 @@ from __future__ import division, print_function
 
 import numpy as np
 
+
 def memoize(function):
     """Provides a decorator for memoizing functions"""
     from functools import wraps

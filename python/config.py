@@ -29,7 +29,7 @@ MIC_RATE = 48000
 
 DISPLAY_FPS = True
 
-FPS = 50
+FPS = 100
 """Desired refresh rate of the visualization (frames per second)
 
 FPS indicates the desired refresh rate, or frames-per-second, of the audio
