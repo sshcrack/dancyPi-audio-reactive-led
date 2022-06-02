@@ -75,7 +75,7 @@ for relativeDevPath in devicesFiles:
 
     c = matching(deviceId, gui=isGui)
     controllers[deviceId] = c
-    thread = Thread(target=lambda: runController(c, deviceId))
+    thread = Thread(target=lambda: runController(c, deviceId), name=f"CONTROLLER-{deviceId}")
     threads.append(thread)
     thread.start()
 
