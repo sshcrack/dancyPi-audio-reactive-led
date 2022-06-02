@@ -64,22 +64,6 @@ def getMatchingController(controller_name: str):
     return None
 
 
-def measureMicThread():
-    if not microphone.isRunning():
-        print("Starting microphone service...")
-        microphone.start()
-    while not exitSignal:
-        out = measureMic()
-        for key in controllers:
-            controllers[key].mel = out
-    print("Stopping microphone...")
-    microphone.stop()
-
-
-def measureMic():
-    raw = microphone.read()
-    return microphone.microphone_update(raw)
-
 
 for relativeDevPath in devicesFiles:
     print(f"Starting thread for device {relativeDevPath}")
@@ -106,9 +90,6 @@ for relativeDevPath in devicesFiles:
     thread = Thread(target=lambda: runController(c, deviceId), name=f"CONTROLLER-{deviceId}")
     threads.append(thread)
     thread.start()
-
-measureThread = Thread(target=measureMicThread, name="MEASURE_MIC")
-measureThread.start()
 
 server = None if minimalMode else MainHTTPServer(controllers)
 if not minimalMode:
