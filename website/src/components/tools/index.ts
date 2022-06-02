@@ -22,5 +22,5 @@ export function hexToRgb(hex: string) {
 
 export function getBaseUrl(location: Location) {
     const { protocol, host } = location
-    return `${protocol}//${host}`
+    return `${protocol}//${/*host*/"10.6.0.1:6789"}`
   }

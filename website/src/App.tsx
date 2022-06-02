@@ -1,6 +1,7 @@
 import { Button, Flex, Heading, IconButton, Spinner, Text, useColorMode, useToast } from '@chakra-ui/react';
 import { useEffect, useState } from 'react';
 import { FaArrowLeft, FaMicrochip, FaRaspberryPi, FaRegMoon, FaRegSun } from 'react-icons/fa';
+import ToggleEverything from './components/ToggleEverything';
 import { getBaseUrl } from './components/tools';
 import Device from './Device';
 import { DeviceList } from './interfaces/DeviceList';
@@ -106,7 +107,7 @@ function App() {
         }
 
         switch (dev) {
-            case "rpi":
+            case "pi":
                 devIcon = <FaRaspberryPi style={style} />
                 break;
             case "esp8266":
@@ -133,10 +134,26 @@ function App() {
     })
 
     return <>
-        <Flex justifyContent='center' alignItems='center' mt='4' flexDir='column' mb='6'>
+        <Flex
+            justifyContent='center'
+            alignItems='center'
+            flexDir='column'
+            mt='4'
+            mb='6'
+            gap='2'
+            w='100%'
+            h='100%'
+        >
             {baseElements}
             <Heading>Devices</Heading>
-            {deviceComps}
+            <ToggleEverything deviceList={deviceList} setUpdate={setUpdate}/>
+            <Flex
+            gap='3'
+            w='100%'
+            justifyContent='center'
+            >
+                {deviceComps}
+            </Flex>
         </Flex>
     </>
 }
