@@ -136,3 +136,4 @@ finally:
             break
 
         print(f"Some threads running: {currRunning}")
+        time.sleep(1.5)
