@@ -9,6 +9,7 @@ from urllib.parse import parse_qs, urlparse
 import mimetypes
 
 from httpserver.base import ThreadedHTTPServer
+from httpserver.main.routes.allenabled import onAllEnabled
 from httpserver.main.routes.devices_list import onDevicesList
 from httpserver.main.routes.devices_options import onDevicesOptions
 from tools.interfaces import getIPs
@@ -83,6 +84,8 @@ class MainHTTPServerHandler(BaseHTTPRequestHandler):
         if p == "/devices/options":
             print("Device options")
             status, res = onDevicesOptions(self.controllers, params)
+        if p == "/allenabled":
+            status, res = onAllEnabled(self.controllers, params)
 
         if status == 404:
             print("Serving static file")
