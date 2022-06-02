@@ -129,15 +129,10 @@ class GeneralController:
             self.api = None
         self.mel = None
 
-        self.micThread = threading.Thread(target=self.measureMicThread)
-        self.micThread.start()
-        self.waitTillThreadMeasures()
-
     def shutdown(self):
         self.shouldExit = True
         self.logger.info("Shutting down")
         self.logger.info("Waiting for mic thread")
-        self.micThread.join()
         self.logger.info("Continuing")
         self.config.save()
         if self.led is not None:
@@ -174,6 +169,9 @@ class GeneralController:
         isVisualizer, useFilters, filterFunc, modeFunc = self.getCurr()
 
         energy, outPixels = self.calculateModePixels(isVisualizer, modeFunc)
+        if energy is None or outPixels is None:
+            return
+
         if useFilters:
             outPixels = filterFunc(outPixels)
             if energy is not None and self.isEnergyBrightness:
@@ -226,6 +224,8 @@ class GeneralController:
 
         shouldReadMicrophone = isVisualizer or self.isEnergyBrightness or self.isEnergySpeed
         if shouldReadMicrophone:
+            if self.mel is None:
+                return None, None
             if isVisualizer:
                 modePixelsOut = modeFunc(self.mel)
             else:
@@ -262,19 +262,3 @@ class GeneralController:
             lambda mel: modeClass.run(mel)
         )
 
-    def measureMicThread(self):
-        if not microphone.isRunning():
-            self.logger.info("Starting microphone service...")
-            microphone.start()
-        while not self.shouldExit:
-            self.mel = self.measureMic()
-
-        microphone.stop()
-
-    def measureMic(self):
-        raw = microphone.read()
-        return microphone.microphone_update(raw)
-
-    def waitTillThreadMeasures(self):
-        while self.mel is None:
-            pass

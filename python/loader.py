@@ -6,6 +6,7 @@ import os.path as path
 import config
 import json
 from base.controller import GeneralController
+from base.visualization import microphone
 from controller.ledstrip.ledStripController import LEDStripController
 from threading import Thread
 from base.hardware.configDict import deviceConfigLocation
@@ -47,14 +48,31 @@ def someThreadsRunning():
 
 
 def getMatchingController(controller_name: str):
-    for c in controllerList:
-        if c.__name__ == controller_name:
-            return c
+    for x in controllerList:
+        if x.__name__ == controller_name:
+            return x
     return None
 
 
+def measureMicThread():
+    if not microphone.isRunning():
+        print("Starting microphone service...")
+        microphone.start()
+    while not exitSignal:
+        out = measureMic()
+        for key in controllers:
+            controllers[key].mel = out
+    print("Stopping microphone...")
+    microphone.stop()
+
+
+def measureMic():
+    raw = microphone.read()
+    return microphone.microphone_update(raw)
+
+
 for relativeDevPath in devicesFiles:
-    print(f"Starting thread for device")
+    print(f"Starting thread for device {relativeDevPath}")
     devPath = path.join(deviceConfigLocation, relativeDevPath)
 
     devFile = open(devPath, "r")
@@ -79,10 +97,13 @@ for relativeDevPath in devicesFiles:
     threads.append(thread)
     thread.start()
 
+measureThread = Thread(target=measureMicThread)
+measureThread.start()
+
 server = None if minimalMode else MainHTTPServer(controllers)
 if not minimalMode:
+    print("Starting Main Server...")
     server.serve(config.BIND_ADDRESS, config.PORT)
-
 try:
     while someThreadsRunning():
         pass
@@ -91,5 +112,6 @@ except KeyboardInterrupt:
 finally:
     print("Sending exit signal...")
     exitSignal = True
+    measureThread.join()
     if not minimalMode:
         server.shutdown()
