@@ -20,6 +20,6 @@ def onAllEnabled(controllers: Dict[str, "GeneralController"], params: List[str])
         })
 
     for c in controllers.values():
-        c.config.set("Enabled", enabled)
+        c.config.set("enabled", enabled)
 
     return 200, { "enabled": enabled }
