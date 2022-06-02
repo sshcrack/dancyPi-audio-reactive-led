@@ -32,6 +32,7 @@ from base.filters.rainbow import RainbowMode
 
 defaultMode = "full"
 defaultFilter = "normal"
+shouldUpdateThreaded = "--update-threaded" in sys.argv
 
 defaultModes = {
     "full": FullMode
@@ -42,6 +43,8 @@ defaultFilters = {
     "normal": NormalMode,
     "rainbow": RainbowMode
 }
+
+
 
 
 class GeneralController:
@@ -181,9 +184,12 @@ class GeneralController:
         outPixels = self.applyEnableAnimation(outPixels)
         outPixels = self.postProcessPixels(outPixels)
         self.pixels = outPixels
-        th = threading.Thread(target=self.updateLeds)
-        th.start()
-        #self.updateLeds()
+
+        if shouldUpdateThreaded:
+            th = threading.Thread(target=self.updateLeds)
+            th.start()
+        else:
+            self.updateLeds()
         if config.DISPLAY_FPS:
             fps = frames_per_second()
             if time() - 0.5 > self.prev_fps_update:
