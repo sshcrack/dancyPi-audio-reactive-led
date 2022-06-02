@@ -16,6 +16,7 @@ def getMax(arr):
 
     return maxVal
 
+
 class RainbowMode(GeneralMode):
     def __init__(self, controller: "GeneralController"):
         super().__init__({
@@ -26,7 +27,7 @@ class RainbowMode(GeneralMode):
                     "func": validate_float("speed"),
                     "type": "float",
                     "sug_min": 0,
-                    "sug_max": 1250
+                    "sug_max": 5
                 }
             }
         }, controller)
