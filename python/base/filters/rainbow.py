@@ -42,7 +42,7 @@ class RainbowMode(GeneralMode):
         deltaTime = self.timer.getDelta()
 
         for i in range(len(r)):
-            maxVal = getMax([r[i], g[i], b[i]])
+            maxVal = np.amax(data[:, i])
             self.rgb_index += deltaTime * speed
             local_led_index = int(self.rgb_index + i)
             values = np.array(tools.wheel(local_led_index)) / 255
