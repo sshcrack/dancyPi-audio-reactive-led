@@ -14,6 +14,7 @@ try:
     import sys
 
     from blinkstick import blinkstick
+
     blinkstickAvailable = True
 except ImportError as e:
     traceback.print_exc()
@@ -22,11 +23,11 @@ except ImportError as e:
 rpiAvailable = False
 try:
     from rpi_ws281x import *
+
     rpiAvailable = True
 except ImportError as e:
     traceback.print_exc()
     logger.warn("Could not import rpi_ws281x, 'pi' as device wont be available")
-
 
 _gamma = np.load(globalConfig.GAMMA_TABLE_PATH)
 """Gamma lookup table used for nonlinear brightness correction"""
@@ -155,6 +156,7 @@ class LEDManager:
         b = p[2][:].astype(int)
         rgb = np.bitwise_or(np.bitwise_or(r, g), b)
         # Update the pixels
+
         for i in range(self.config.N_PIXELS):
             # Ignore pixels if they haven't changed (saves bandwidth)
             if np.array_equal(p[:, i], self._prev_pixels[:, i]):
@@ -165,6 +167,10 @@ class LEDManager:
         self.strip.show()
 
     def update(self, pixels: np.ndarray):
+        if pixels.shape[1] != self.config.N_PIXELS:
+            self.logger.warn(f"Invalid pixel shape {pixels.shape} (has to have (3, {self.config.N_PIXELS}). Skipping")
+            return
+
         dev = self.config.DEVICE
         self.pixels = pixels
 
