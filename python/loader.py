@@ -24,6 +24,7 @@ controllerList = [
     ShelfController
 ]
 isGui = "--gui" in sys.argv
+minimalMode = "--minimal" in sys.argv
 
 
 def runController(controller: GeneralController, devId: str):
@@ -78,8 +79,9 @@ for relativeDevPath in devicesFiles:
     threads.append(thread)
     thread.start()
 
-server = MainHTTPServer(controllers)
-server.serve(config.BIND_ADDRESS, config.PORT)
+server = None if minimalMode else MainHTTPServer(controllers)
+if not minimalMode:
+    server.serve(config.BIND_ADDRESS, config.PORT)
 
 try:
     while someThreadsRunning():
@@ -89,4 +91,5 @@ except KeyboardInterrupt:
 finally:
     print("Sending exit signal...")
     exitSignal = True
-    server.shutdown()
+    if not minimalMode:
+        server.shutdown()

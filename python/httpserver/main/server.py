@@ -47,7 +47,7 @@ class MainHTTPServerHandler(BaseHTTPRequestHandler):
                         '{"error": "device_id has to be in parameters to use api functions and has to be a string"}'.encode(
                             "utf-8"))
                     return
-                c = self.controllers[deviceId[0]]
+                c = self.controllers.get(deviceId[0])
                 if c is None:
                     print(f"No controller could be found for {deviceId[0]}")
                     self.send_response(401)
@@ -77,25 +77,25 @@ class MainHTTPServerHandler(BaseHTTPRequestHandler):
 
         status, res = (404, {"error": "Path not found"})
         p = parsed.path
-        print("Parsed path is", p)
-        if p == "/devices_list":
+        if p == "/devices/list":
             print("deivces list")
             status, res = onDevicesList(self.controllers, params)
-        if p == "/devices_options":
+        if p == "/devices/options":
             print("Device options")
             status, res = onDevicesOptions(self.controllers, params)
 
         if status == 404:
             print("Serving static file")
-            return self.serveStaticFiles()
+            return self.serveStaticFiles(p)
 
         self.send_response(status)
         self._set_headers()
         self.wfile.write(json.dumps(res).encode("utf-8"))
 
-    def serveStaticFiles(self):
-        server_path = self.path.replace("..", "")[1:]
+    def serveStaticFiles(self, req_path: str):
+        server_path = req_path.replace("..", "")[1:]
         first_lookup = path.join(websiteFiles, server_path)
+        print(server_path)
 
         def defaultReturn(file_path: str):
             mime = "text/plain"
@@ -125,7 +125,7 @@ class MainHTTPServerHandler(BaseHTTPRequestHandler):
         self.send_header("Content-Type", "text/plain")
         self.end_headers()
 
-        self.wfile.close()
+        self.wfile.write("<h1>404 Not Found</h1>".encode("utf-8"))
         return
 
 
@@ -147,12 +147,10 @@ class MainHTTPServer:
 
         print("Getting ips...")
         ips = getIPs()
-        last_addr = ".".join(address.split(".")[:-1])
 
         if address == "0.0.0.0":
             matching_ips = ["127.0.0.1"]
             for ip in ips:
-                #if last_addr in ip:
                 matching_ips.append(ip)
         else:
             matching_ips = [address]

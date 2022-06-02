@@ -1,4 +1,5 @@
 import os
+import sys
 import threading
 import traceback
 from typing import Any, Dict
@@ -59,6 +60,7 @@ class GeneralController:
         if configDefaults is None:
             configDefaults = {}
 
+        self.minimalMode = "--minimal" in sys.argv
         self.deviceId = deviceId
         self.logger = getLogger("GeneralController", deviceId)
         self.device = loadDeviceConfig(deviceId)
@@ -119,8 +121,11 @@ class GeneralController:
         if self.gui is None and self.led is None:
             raise ValueError("Neither GUI nor LEDS could be loaded. Stopping.")
 
-        self.api = APIServer(self)
-        self.api.serve("127.0.0.1", find_free_port())
+        if not self.minimalMode:
+            self.api = APIServer(self)
+            self.api.serve("127.0.0.1", find_free_port())
+        else:
+            self.api = None
         self.mel = None
 
         self.micThread = threading.Thread(target=self.measureMicThread)
@@ -138,7 +143,8 @@ class GeneralController:
             self.led.stop(self.pixels)
         if self.gui is not None:
             self.gui.shouldRun = False
-        self.api.shutdown()
+        if self.api is not None:
+            self.api.shutdown()
 
     def updateVars(self):
         self.enabled = self.config.get("enabled")
@@ -175,9 +181,9 @@ class GeneralController:
         outPixels = self.applyEnableAnimation(outPixels)
         outPixels = self.postProcessPixels(outPixels)
         self.pixels = outPixels
-        #th = threading.Thread(target=self.updateLeds)
-        #th.start()
-        self.updateLeds()
+        th = threading.Thread(target=self.updateLeds)
+        th.start()
+        #self.updateLeds()
         if config.DISPLAY_FPS:
             fps = frames_per_second()
             if time() - 0.5 > self.prev_fps_update:

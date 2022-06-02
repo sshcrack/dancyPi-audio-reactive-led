@@ -17,6 +17,23 @@ def getMax(arr):
     return maxVal
 
 
+from functools import wraps
+from time import time
+
+
+def timing(f):
+    @wraps(f)
+    def wrap(*args, **kw):
+        ts = time()
+        result = f(*args, **kw)
+        te = time()
+        print('func:%r args:[%r, %r] took: %2.4f sec' % \
+              (f.__name__, args, kw, te - ts))
+        return result
+
+    return wrap
+
+
 class RainbowMode(GeneralMode):
     def __init__(self, controller: "GeneralController"):
         super().__init__({
@@ -33,6 +50,7 @@ class RainbowMode(GeneralMode):
         }, controller)
         self.rgb_index = 0
 
+    @timing
     def run(self, data):
         r, g, b = data
         speed = self.config.get("rainbow_speed", 1)
