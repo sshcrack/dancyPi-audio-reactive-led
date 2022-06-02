@@ -1,4 +1,5 @@
 import sys
+import threading
 import time
 import traceback
 
@@ -129,3 +130,9 @@ finally:
     while someThreadsRunning():
         print(f"Still some controllers running: {getAliveThreads()}")
         time.sleep(1.5)
+    while True:
+        currRunning = threading.enumerate()
+        if len(currRunning) == 0:
+            break
+
+        print(f"Some threads running: {currRunning}")
