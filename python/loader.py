@@ -107,7 +107,7 @@ for relativeDevPath in devicesFiles:
     threads.append(thread)
     thread.start()
 
-measureThread = Thread(target=measureMicThread)
+measureThread = Thread(target=measureMicThread, name="MEASURE_MIC")
 measureThread.start()
 
 server = None if minimalMode else MainHTTPServer(controllers)
@@ -132,7 +132,7 @@ finally:
         time.sleep(1.5)
     while True:
         currRunning = threading.enumerate()
-        if len(currRunning) == 0:
+        if len(currRunning) <= 1:
             break
 
         print(f"Some threads running: {currRunning}")

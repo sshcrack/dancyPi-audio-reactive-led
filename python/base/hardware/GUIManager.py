@@ -17,7 +17,7 @@ class GUIManager:
         self.exitSignal = False
         self.shouldRun = True
 
-        self.thread = Thread(target=self.guiThread, daemon=True)
+        self.thread = Thread(target=self.guiThread, daemon=True, name=f"GUI-Thread-{deviceId}")
         self.thread.start()
 
     def stop(self):

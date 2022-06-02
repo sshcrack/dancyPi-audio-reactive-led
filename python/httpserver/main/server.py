@@ -162,7 +162,7 @@ class MainHTTPServer:
         self.address = address
         self.port = port
         self.httpd = httpd
-        self.thread = Thread(target=httpd.serve_forever)
+        self.thread = Thread(target=httpd.serve_forever, name="MAIN_SERVER")
         self.thread.start()
 
     def shutdown(self):

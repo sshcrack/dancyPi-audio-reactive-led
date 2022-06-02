@@ -36,7 +36,7 @@ try:
             if led >= PIXELS:
                 continue
             strip[led] = (r, g, b)
-        th = Thread(target=show)
+        th = Thread(target=show, name=f"UDP_RECEIVER")
         th.start()
 except KeyboardInterrupt:
     pass
