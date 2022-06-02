@@ -1,5 +1,6 @@
+import os
 import sys
-from threading import Thread
+import threading
 import traceback
 from typing import Any, Dict
 
@@ -9,7 +10,6 @@ import numpy as np
 
 import config
 from base.hardware.configDict import loadDeviceConfig
-from base.visualization.microphone import Microphone
 from customLogger.log import getLogger
 from httpserver.api.apiServer import APIServer
 from tools.interfaces import find_free_port
@@ -128,12 +128,6 @@ class GeneralController:
             self.api = None
         self.mel = None
 
-        self.logger.info("Initializing microphone...")
-        self.microphone = Microphone()
-
-        measureThread = Thread(target=self.measureMicThread, name=f"MEASURE_MIC_{self.deviceId}")
-        measureThread.start()
-
     def shutdown(self):
         self.shouldExit = True
         self.logger.info("Shutting down")
@@ -185,7 +179,7 @@ class GeneralController:
         self.pixels = outPixels
 
         if not preventLEDThreadUpdate:
-            th = Thread(target=lambda: self.updateLeds(outPixels), name=f"LED_UPDATE_{id(time())}", daemon=False)
+            th = threading.Thread(target=lambda: self.updateLeds(outPixels), name=f"LED_UPDATE_{id(time())}", daemon=False)
             th.start()
         else:
             self.updateLeds()
@@ -194,7 +188,6 @@ class GeneralController:
             if time() - 0.5 > self.prev_fps_update:
                 self.prev_fps_update = time()
                 self.logger.debug('] FPS {:.0f} / {:.0f}'.format(fps, config.FPS))
-
 
     def postProcessPixels(self, data: np.ndarray):
         return data
@@ -268,7 +261,3 @@ class GeneralController:
             lambda mel: modeClass.run(mel)
         )
 
-    def measureMicThread(self):
-        while not self.shouldExit:
-            raw = self.microphone.read()
-            self.mel = self.microphone.microphone_update(raw)
