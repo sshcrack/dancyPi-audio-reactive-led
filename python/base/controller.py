@@ -179,7 +179,7 @@ class GeneralController:
         self.pixels = outPixels
 
         if not preventLEDThreadUpdate:
-            th = threading.Thread(target=self.updateLeds)
+            th = threading.Thread(target=lambda: self.updateLeds(outPixels))
             th.start()
         else:
             self.updateLeds()
