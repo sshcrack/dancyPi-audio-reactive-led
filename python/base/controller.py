@@ -225,6 +225,7 @@ class GeneralController:
         shouldReadMicrophone = isVisualizer or self.isEnergyBrightness or self.isEnergySpeed
         if shouldReadMicrophone:
             if self.mel is None:
+                print("No mel")
                 return None, None
             if isVisualizer:
                 modePixelsOut = modeFunc(self.mel)

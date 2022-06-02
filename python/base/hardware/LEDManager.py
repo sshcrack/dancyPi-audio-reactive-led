@@ -155,7 +155,6 @@ class LEDManager:
         b = p[2][:].astype(int)
         rgb = np.bitwise_or(np.bitwise_or(r, g), b)
         # Update the pixels
-        self.logger.debug(f"pixels: {pixels.shape} prev: {self._prev_pixels.shape}")
         for i in range(self.config.N_PIXELS):
             # Ignore pixels if they haven't changed (saves bandwidth)
             if np.array_equal(p[:, i], self._prev_pixels[:, i]):
