@@ -18,7 +18,6 @@ from base.visualization.dsp import ExpFilter
 from tools.fps import frames_per_second
 from base.configManager import ConfigManager
 from tools.energyspeed import getAvgEnergy
-import base.visualization.microphone as microphone
 from tools.timer import Timer
 from tools.tools import clamp
 from base.hardware.GUIManager import GUIManager
@@ -32,7 +31,7 @@ from base.filters.rainbow import RainbowMode
 
 defaultMode = "full"
 defaultFilter = "normal"
-shouldUpdateThreaded = "--update-threaded" in sys.argv
+preventLEDThreadUpdate = "--update-sync" in sys.argv
 
 defaultModes = {
     "full": FullMode
@@ -169,7 +168,7 @@ class GeneralController:
         isVisualizer, useFilters, filterFunc, modeFunc = self.getCurr()
 
         energy, outPixels = self.calculateModePixels(isVisualizer, modeFunc)
-        if energy is None or outPixels is None:
+        if energy is None and outPixels is None:
             return
 
         if useFilters:
@@ -181,7 +180,7 @@ class GeneralController:
         outPixels = self.postProcessPixels(outPixels)
         self.pixels = outPixels
 
-        if shouldUpdateThreaded:
+        if not preventLEDThreadUpdate:
             th = threading.Thread(target=self.updateLeds)
             th.start()
         else:
@@ -225,7 +224,6 @@ class GeneralController:
         shouldReadMicrophone = isVisualizer or self.isEnergyBrightness or self.isEnergySpeed
         if shouldReadMicrophone:
             if self.mel is None:
-                print("No mel")
                 return None, None
             if isVisualizer:
                 modePixelsOut = modeFunc(self.mel)
