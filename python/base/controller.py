@@ -131,8 +131,6 @@ class GeneralController:
     def shutdown(self):
         self.shouldExit = True
         self.logger.info("Shutting down")
-        self.logger.info("Waiting for mic thread")
-        self.logger.info("Continuing")
         self.config.save()
         if self.led is not None:
             self.led.stop(self.pixels)

@@ -1,4 +1,5 @@
 import sys
+import time
 import traceback
 
 import os
@@ -45,6 +46,14 @@ def someThreadsRunning():
         if e.is_alive():
             return True
     return False
+
+
+def getAliveThreads():
+    threadNames = []
+    for e in threads:
+        if e.is_alive():
+            threadNames.append(e.name)
+    return threadNames
 
 
 def getMatchingController(controller_name: str):
@@ -114,4 +123,9 @@ finally:
     exitSignal = True
     measureThread.join()
     if not minimalMode:
+        print("Shutting server down...")
         server.shutdown()
+
+    while someThreadsRunning():
+        print(f"Still some controllers running: {getAliveThreads()}")
+        time.sleep(1.5)
