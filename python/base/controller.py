@@ -192,11 +192,13 @@ class GeneralController:
     def postProcessPixels(self, data: np.ndarray):
         return data
 
-    def updateLeds(self):
+    def updateLeds(self, p=None):
+        if p is None:
+            p = self.pixels
         if self.led is not None:
-            self.led.update(self.pixels)
+            self.led.update(p)
         if self.gui is not None:
-            self.gui.update(self.pixels)
+            self.gui.update(p)
 
     def applyEnableAnimation(self, outPixels: np.ndarray):
         delta = self.timer.getDelta()
