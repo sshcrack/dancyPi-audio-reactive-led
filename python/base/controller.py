@@ -20,7 +20,7 @@ from base.configManager import ConfigManager
 from tools.energyspeed import getAvgEnergy
 import base.visualization.microphone as microphone
 from tools.timer import Timer
-from tools.tools import clamp, timeit
+from tools.tools import clamp
 from base.hardware.GUIManager import GUIManager
 from base.hardware.LEDManager import LEDManager
 from base.modes.full import FullMode
@@ -43,8 +43,6 @@ defaultFilters = {
     "normal": NormalMode,
     "rainbow": RainbowMode
 }
-
-
 
 
 class GeneralController:
@@ -103,7 +101,7 @@ class GeneralController:
         self.prev_fps_update = time()
 
         try:
-            self.led = LEDManager(self.device)
+            self.led = LEDManager(self.device, self.deviceId)
         except ImportError as e:
             self.logger.warn(f"Could not load LEDManager. Disabling leds.")
             traceback.print_exc()

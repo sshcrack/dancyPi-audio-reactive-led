@@ -33,8 +33,9 @@ _gamma = np.load(globalConfig.GAMMA_TABLE_PATH)
 
 
 class LEDManager:
-    def __init__(self, config: GeneralLEDConfig):
+    def __init__(self, config: GeneralLEDConfig, devId: str):
         self.config = config
+        self.logger = getLogger("LEDManager", devId)
 
         self._prev_pixels = np.tile(253, (3, config.N_PIXELS))
         """Pixel values that were most recently displayed on the LED strip"""
@@ -42,7 +43,9 @@ class LEDManager:
         self.pixels = np.tile(1, (3, config.N_PIXELS))
         """Pixel values for the LED strip"""
 
+        self.logger.debug(f"Constructed prevPixels with length of {config.N_PIXELS}")
         dev = self.config.DEVICE
+
         if dev == "blinkstick":
             if not blinkstickAvailable:
                 raise RuntimeError("Blinkstick not enabled. Look at log to fix")
@@ -152,6 +155,7 @@ class LEDManager:
         b = p[2][:].astype(int)
         rgb = np.bitwise_or(np.bitwise_or(r, g), b)
         # Update the pixels
+        self.logger.debug(f"pixels: {pixels.shape} prev: {self._prev_pixels.shape}")
         for i in range(self.config.N_PIXELS):
             # Ignore pixels if they haven't changed (saves bandwidth)
             if np.array_equal(p[:, i], self._prev_pixels[:, i]):
