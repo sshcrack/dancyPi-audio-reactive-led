@@ -8,7 +8,6 @@ gain = dsp.ExpFilter(np.tile(0.01, config.N_FFT_BINS),
 
 def getAvgEnergy(mel, pixels: int):
     """Effect that expands from the center with increasing sound energy"""
-    global p
     mel = np.copy(mel)
     gain.update(mel)
     mel /= gain.value

@@ -16,10 +16,8 @@ audio input and control the LED strip directly.
 to control the leds connected to it.
 """
 
-
 GESTURE_SENSOR_ENABLED = False
 """Whether a Groove Gesture Sensor is connected to the pi"""
-
 
 GAMMA_TABLE_PATH = os.path.join(os.path.dirname(__file__), 'base', 'visualization', 'gamma_table.npy')
 """Location of the gamma correction table"""

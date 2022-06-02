@@ -33,30 +33,25 @@ defaultMode = "full"
 defaultFilter = "normal"
 preventLEDThreadUpdate = "--update-sync" in sys.argv
 
-defaultModes = {
-    "full": FullMode
-}
-
-defaultFilters = {
-    "hex": HexFilter,
-    "normal": NormalMode,
-    "rainbow": RainbowMode
-}
-
 
 class GeneralController:
-    config: ConfigManager
-    api: APIServer
-    deviceId: str
-    timer = Timer()
-    initialized = False
-    shouldExit = False
-    modes: Dict[str, GeneralMode] = {}
-    filters: Dict[str, GeneralFilter] = {}
-
     energy_filter: ExpFilter
 
     def __init__(self, deviceId: str, modes: Dict[str, Any], filters: Dict[str, Any], configDefaults=None, gui=False):
+        self.shouldExit = False
+        self.initialized = False
+        self.timer = Timer()
+
+        defaultModes = {
+            "full": FullMode
+        }
+
+        defaultFilters = {
+            "hex": HexFilter,
+            "normal": NormalMode,
+            "rainbow": RainbowMode
+        }
+
         if configDefaults is None:
             configDefaults = {}
 
@@ -80,10 +75,13 @@ class GeneralController:
 
         self.constructorModes = {**defaultModes, **modes}
         self.constructorFilters = {**defaultFilters, **filters}
+        self.modes: Dict[str, GeneralMode] = {}
+        self.filters: Dict[str, GeneralFilter] = {}
 
         for keyMode in list(self.constructorModes.keys()):
             self.logger.debug(f"Loading mode {keyMode}...")
             self.modes[keyMode] = self.constructorModes[keyMode](self)
+            self.logger.debug(f"Mode {keyMode} loaded. {self.modes[keyMode]}")
 
         for keyFilter in list(self.constructorFilters.keys()):
             self.logger.debug(f"Loading filter {keyFilter}...")
@@ -163,14 +161,14 @@ class GeneralController:
             self.timer.update()
             return
 
-        isVisualizer, useFilters, filterFunc, modeFunc = self.getCurr()
+        isVisualizer, useFilters, filterClass, modeClass = self.getCurr()
 
-        energy, outPixels = self.calculateModePixels(isVisualizer, modeFunc)
+        energy, outPixels = self.calculateModePixels(isVisualizer, modeClass)
         if energy is None and outPixels is None:
             return
 
         if useFilters:
-            outPixels = filterFunc(outPixels)
+            outPixels = filterClass.run(outPixels)
             if energy is not None and self.isEnergyBrightness:
                 outPixels = self.calculateEnergyBrightness(outPixels, energy)
 
@@ -179,7 +177,8 @@ class GeneralController:
         self.pixels = outPixels
 
         if not preventLEDThreadUpdate:
-            th = threading.Thread(target=lambda: self.updateLeds(outPixels), name=f"LED_UPDATE_{id(time())}", daemon=False)
+            th = threading.Thread(target=lambda: self.updateLeds(outPixels), name=f"LED_UPDATE_{id(time())}",
+                                  daemon=False)
             th.start()
         else:
             self.updateLeds()
@@ -217,7 +216,7 @@ class GeneralController:
     def calculateEnergyBrightness(self, outPixels: np.ndarray, energy: float):
         return multipleIntArr(outPixels, energy * self.energyBrightnessMult)
 
-    def calculateModePixels(self, isVisualizer: bool, modeFunc):
+    def calculateModePixels(self, isVisualizer: bool, modeClass):
         energy = None
         modePixelsOut = None
 
@@ -226,14 +225,14 @@ class GeneralController:
             if self.mel is None:
                 return None, None
             if isVisualizer:
-                modePixelsOut = modeFunc(self.mel)
+                modePixelsOut = modeClass.run(self.mel)
             else:
                 avgEnergy = getAvgEnergy(self.mel, self.device.N_PIXELS)
                 energy = self.energy_filter.update(avgEnergy)
                 self.config.set("energy_curr", energy)
 
         if not isVisualizer:
-            modePixelsOut = modeFunc(None)
+            modePixelsOut = modeClass.run(None)
         self.timer.update()
 
         return energy, modePixelsOut
@@ -257,7 +256,6 @@ class GeneralController:
         return (
             isVisualizer,
             useFilters,
-            lambda data: filterClass.run(data),
-            lambda mel: modeClass.run(mel)
+            filterClass,
+            modeClass
         )
-
