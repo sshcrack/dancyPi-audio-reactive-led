@@ -1,6 +1,6 @@
-import { Box, Button, Flex, Heading, IconButton, Select, Spinner, Switch, Text, useColorMode, useToast } from "@chakra-ui/react"
+import { Box, Button, Flex, Heading, IconButton, Select, Spinner, Switch, Text, useToast } from "@chakra-ui/react"
 import { ChangeEvent, Dispatch, useCallback, useEffect, useState } from 'react'
-import { FaLock, FaRaspberryPi, FaRegMoon, FaRegSun, FaUnlock } from "react-icons/fa"
+import { FaLock, FaUnlock } from "react-icons/fa"
 import './App.css'
 import EnergyComp from './components/Energy'
 import GeneralComp from './components/GeneralComp'

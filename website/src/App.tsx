@@ -82,14 +82,24 @@ function App() {
 
     if (currDevice)
         return <>
-            {baseElements}
-            <Flex mt='5'>
-                <Button leftIcon={<FaArrowLeft />} onClick={() => {
+            <Flex>
+                <Button
+                ml='7'
+                mt='7'
+                leftIcon={<FaArrowLeft />}
+                onClick={() => {
                     updateDevices(undefined)
                     setCurrDevice(undefined)
                 }}>Back</Button>
+                {baseElements}
             </Flex>
+            <Flex
+                mt='5'
+                justifyContent='center'
+                alignItems='center'>
 
+                <Heading>{currDevice}</Heading>
+            </Flex>
             <Device deviceId={currDevice} />
         </>
 
@@ -98,9 +108,11 @@ function App() {
     if (!deviceList)
         return <Spinner />
 
-    const deviceComps = Object.entries(deviceList).map(([deviceId, { device }]) => {
+    const deviceComps = Object.entries(deviceList).map(([deviceId, { device, config }]) => {
         const dev = device.DEVICE
+        const enabled = config.enabled
         let devIcon = <></>
+
         const style = {
             width: "2.5em",
             height: "2.5em"
@@ -123,6 +135,8 @@ function App() {
             alignItems='center'
             justifyContent='space-evenly'
             key={`${dev}-DeviceList`}
+            _hover={enabled ? { bg: 'green.300' } : { bg: "red.300" }}
+            bg={enabled ? 'green.500' : 'red.500'}
             onClick={() => {
                 setCurrDevice(deviceId)
                 updateDevices(deviceId)
@@ -146,11 +160,11 @@ function App() {
         >
             {baseElements}
             <Heading>Devices</Heading>
-            <ToggleEverything deviceList={deviceList} setUpdate={setUpdate}/>
+            <ToggleEverything deviceList={deviceList} setUpdate={setUpdate} />
             <Flex
-            gap='3'
-            w='100%'
-            justifyContent='center'
+                gap='3'
+                w='100%'
+                justifyContent='center'
             >
                 {deviceComps}
             </Flex>
