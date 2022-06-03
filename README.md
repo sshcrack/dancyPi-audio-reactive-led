@@ -1,5 +1,4 @@
-# RPI Music Visualizer
-#### NOTE: This is a Repository for RPI ONLY (others haven't been tested)
+# RPI Music Visualizer - Audio Reactive
 
 <br>
 <br>
