@@ -1,4 +1,3 @@
-import os
 import sys
 import threading
 import traceback
@@ -20,7 +19,6 @@ from base.configManager import ConfigManager
 from tools.energyspeed import getAvgEnergy
 from tools.timer import Timer
 from tools.tools import clamp
-from base.hardware.GUIManager import GUIManager
 from base.hardware.LEDManager import LEDManager
 from base.modes.full import FullMode
 from base.filters.hex import HexFilter
@@ -37,7 +35,7 @@ preventLEDThreadUpdate = "--update-sync" in sys.argv
 class GeneralController:
     energy_filter: ExpFilter
 
-    def __init__(self, deviceId: str, modes: Dict[str, Any], filters: Dict[str, Any], configDefaults=None, gui=False):
+    def __init__(self, deviceId: str, modes: Dict[str, Any], filters: Dict[str, Any], configDefaults=None):
         self.shouldExit = False
         self.initialized = False
         self.timer = Timer()
@@ -108,17 +106,6 @@ class GeneralController:
             traceback.print_exc()
             self.led = None
 
-        self.gui = None
-        if gui:
-            try:
-                self.gui = GUIManager(self.device, deviceId)
-            except Exception as e:
-                self.logger.warn(f"Could not start GUI Manager. Disabling...")
-                traceback.print_exc()
-
-        if self.gui is None and self.led is None:
-            raise ValueError("Neither GUI nor LEDS could be loaded. Stopping.")
-
         if not self.minimalMode:
             self.api = APIServer(self)
             self.api.serve("127.0.0.1", find_free_port())
@@ -132,8 +119,6 @@ class GeneralController:
         self.config.save()
         if self.led is not None:
             self.led.stop(self.pixels)
-        if self.gui is not None:
-            self.gui.shouldRun = False
         if self.api is not None:
             self.api.shutdown()
 
@@ -150,10 +135,7 @@ class GeneralController:
 
     def run(self):
         if round(time()) % 3 == 0:
-            if self.gui is not None and self.gui.exitSignal:
-                self.shouldExit = True
             self.updateVars()
-
         if not self.enabled and self.currEnableAnimationState == 0:
             self.pixels *= 0
             self.updateLeds()
@@ -194,10 +176,10 @@ class GeneralController:
     def updateLeds(self, p=None):
         if p is None:
             p = self.pixels
+        else:
+            self.pixels = p
         if self.led is not None:
             self.led.update(p)
-        if self.gui is not None:
-            self.gui.update(p)
 
     def applyEnableAnimation(self, outPixels: np.ndarray):
         delta = self.timer.getDelta()

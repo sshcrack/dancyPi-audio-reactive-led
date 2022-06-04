@@ -8,7 +8,7 @@ from controller.ledstrip.modes.visualization.spectrum import SpectrumVisualizerM
 
 
 class LEDStripController(GeneralController):
-    def __init__(self, deviceId: str, gui=False, additionalModes=None):
+    def __init__(self, deviceId: str, additionalModes=None):
         modes = {
             "stack": StackMode,
             "scanner": ScannerMode,
@@ -28,4 +28,4 @@ class LEDStripController(GeneralController):
         if additionalModes is None:
             additionalModes = {}
 
-        super().__init__(deviceId, {**additionalModes, **modes}, filters={}, configDefaults=defaultConfig, gui=gui)
+        super().__init__(deviceId, {**additionalModes, **modes}, filters={}, configDefaults=defaultConfig)

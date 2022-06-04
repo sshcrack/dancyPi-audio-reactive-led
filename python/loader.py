@@ -8,6 +8,7 @@ import os.path as path
 import config
 import json
 from base.controller import GeneralController
+from base.hardware.GUIManager import GUIManager
 from base.visualization import microphone
 from controller.ledstrip.ledStripController import LEDStripController
 from threading import Thread
@@ -101,12 +102,14 @@ for relativeDevPath in devicesFiles:
         print("Could not find matching controller for", deviceId, "continuing...")
         continue
 
-    c = matching(deviceId, gui=isGui)
+    c = matching(deviceId)
     controllers[deviceId] = c
     thread = Thread(target=lambda: runController(c, deviceId), name=f"CONTROLLER-{deviceId}")
     threads.append(thread)
     thread.start()
 
+
+gui = GUIManager(controllers) if isGui else None
 measureThread = Thread(target=measureMicThread, name="MEASURE_MIC")
 measureThread.start()
 
@@ -114,8 +117,9 @@ server = None if minimalMode else MainHTTPServer(controllers)
 if not minimalMode:
     print("Starting Main Server...")
     server.serve(config.BIND_ADDRESS, config.PORT)
+
 try:
-    while someThreadsRunning():
+    while someThreadsRunning() and (gui is None or not gui.exitSignal):
         pass
 except KeyboardInterrupt:
     pass
@@ -123,6 +127,9 @@ finally:
     print("Sending exit signal...")
     exitSignal = True
     measureThread.join()
+    if isGui:
+        gui.stop()
+
     if not minimalMode:
         print("Shutting server down...")
         server.shutdown()

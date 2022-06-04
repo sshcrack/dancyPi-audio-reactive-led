@@ -1,3 +1,4 @@
+import time
 import traceback
 
 import numpy as np
@@ -185,4 +186,7 @@ class LEDManager:
 
     def stop(self, pixels):
         pixels *= 0
-        self.update(pixels)
+        # To ensure even on udp all pixels are turned off
+        for i in range(5):
+            self.update(pixels)
+            time.sleep(0.01)

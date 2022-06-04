@@ -10,8 +10,8 @@ modes = {
 
 
 class ShelfController(LEDStripController):
-    def __init__(self, deviceId: str, gui=False):
-        super().__init__(deviceId, gui, additionalModes=modes)
+    def __init__(self, deviceId: str):
+        super().__init__(deviceId, additionalModes=modes)
 
     def postProcessPixels(self, data: np.ndarray):
         mapped = np.copy(data)
