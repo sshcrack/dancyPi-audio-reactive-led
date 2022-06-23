@@ -138,7 +138,7 @@ class GeneralController:
             self.updateVars()
         if not self.enabled and self.currEnableAnimationState == 0:
             self.pixels *= 0
-            self.updateLeds()
+            self.updateLeds(True)
 
             self.timer.update()
             return
@@ -173,13 +173,13 @@ class GeneralController:
     def postProcessPixels(self, data: np.ndarray):
         return data
 
-    def updateLeds(self, p=None):
+    def updateLeds(self, p=None, force=False):
         if p is None:
             p = self.pixels
         else:
             self.pixels = p
         if self.led is not None:
-            self.led.update(p)
+            self.led.update(p, force)
 
     def applyEnableAnimation(self, outPixels: np.ndarray):
         delta = self.timer.getDelta()
