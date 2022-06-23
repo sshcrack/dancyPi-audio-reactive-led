@@ -72,7 +72,7 @@ class LEDManager:
         elif "esp8266":
             self._sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
-    def _update_esp8266(self, pixels: np.ndarray):
+    def _update_esp8266(self, pixels: np.ndarray, force: bool):
         """Sends UDP packets to ESP8266 to update LED strip values
 
         The ESP8266 will receive and decode the packets to determine what values
@@ -98,7 +98,8 @@ class LEDManager:
 
         # Pixel indices
         idx = range(pixels.shape[1])
-        idx = [i for i in idx if not np.array_equal(p[:, i], self._prev_pixels[:, i])]
+        if not force:
+            idx = [i for i in idx if not np.array_equal(p[:, i], self._prev_pixels[:, i])]
         n_packets = len(idx) // MAX_PIXELS_PER_PACKET + 1
         idx = np.array_split(idx, n_packets)
 
@@ -113,7 +114,7 @@ class LEDManager:
             self._sock.sendto(m, (espConfig.UDP_IP, espConfig.UDP_PORT))
         self._prev_pixels = np.copy(p)
 
-    def _update_blinkstick(self, pixels: np.ndarray):
+    def _update_blinkstick(self, pixels: np.ndarray, force: bool):
         """Writes new LED values to the Blinkstick.
             This function updates the LED strip with new values.
         """
@@ -138,7 +139,7 @@ class LEDManager:
         # send the data to the blinkstick
         self.stick.set_led_data(0, newstrip)
 
-    def _update_pi(self, pixels: np.ndarray):
+    def _update_pi(self, pixels: np.ndarray, force: bool):
         """Writes new LED values to the Raspberry Pi's LED strip
 
         Raspberry Pi uses the rpi_ws281x to control the LED strip directly.
@@ -160,14 +161,14 @@ class LEDManager:
 
         for i in range(self.config.N_PIXELS):
             # Ignore pixels if they haven't changed (saves bandwidth)
-            if np.array_equal(p[:, i], self._prev_pixels[:, i]):
+            if np.array_equal(p[:, i], self._prev_pixels[:, i]) and not force:
                 continue
 
             self.strip._led_data[i] = int(rgb[i])
         self._prev_pixels = np.copy(p)
         self.strip.show()
 
-    def update(self, pixels: np.ndarray):
+    def update(self, pixels: np.ndarray, force=False):
         if pixels.shape[1] != self.config.N_PIXELS:
             self.logger.warn(f"Invalid pixel shape {pixels.shape} (has to have (3, {self.config.N_PIXELS}). Skipping")
             return
@@ -176,11 +177,11 @@ class LEDManager:
         self.pixels = pixels
 
         if dev == "esp8266":
-            self._update_esp8266(pixels)
+            self._update_esp8266(pixels, force)
         elif dev == "pi":
-            self._update_pi(pixels)
+            self._update_pi(pixels, force)
         elif dev == "blinkstick":
-            self._update_blinkstick(pixels)
+            self._update_blinkstick(pixels, force)
         else:
             raise ValueError("Invalid device given in config")
 
@@ -188,5 +189,5 @@ class LEDManager:
         pixels *= 0
         # To ensure even on udp all pixels are turned off
         for i in range(5):
-            self.update(pixels)
+            self.update(pixels, True)
             time.sleep(0.01)
