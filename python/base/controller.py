@@ -138,7 +138,7 @@ class GeneralController:
             self.updateVars()
         if not self.enabled and self.currEnableAnimationState == 0:
             self.pixels *= 0
-            self.updateLeds(True)
+            self.updateLeds(force=True)
 
             self.timer.update()
             return
