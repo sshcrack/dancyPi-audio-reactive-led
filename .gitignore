@@ -27,3 +27,5 @@ yarn-error.log*
 __pycache__
 python/config.py
 python/vars.json
+python/storage/*.json
+python/device_config/*.json

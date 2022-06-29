@@ -1,7 +1,7 @@
 import time
 
 import config
-from modes.visualization import dsp
+from base.visualization import dsp
 
 _time_prev = time.time() * 1000.0
 """The previous time that the frames_per_second() function was called"""

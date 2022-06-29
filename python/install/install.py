@@ -4,6 +4,7 @@
 # Author: Nazmus Nasir (modified by sshcrack)
 # Website: https://www.easyprogramming.net / https://sshcrack.me
 import sys
+
 sys.path.append('..')
 
 import os
@@ -14,13 +15,14 @@ from shutil import copy2
 
 add_service = False
 
+
 def setup_service():
     global add_service
     if not add_service:
         return
 
     print("================== Adding service ======================")
-    f = open("rpimusicvisualizer.service","r")
+    f = open("rpimusicvisualizer.service", "r")
     content = f.read()
     f.close()
 
@@ -38,13 +40,17 @@ def setup_service():
     os.system("systemctl enable rpimusicvisualizer.service")
     os.system("systemctl start rpimusicvisualizer")
     print("================== Completed enabling service ==========")
+
+
 def setup_config():
     global add_service
     print("================== Setting up config ====================")
     led_pin = number_input("To which pin is your led strip connected? (default 18)", default=18, optional=True)
-    led_invert = boolean_input("Do you have a inverting logic level converter installed? (Default False, if you dont know what it is just enter no)")
+    led_invert = boolean_input(
+        "Do you have a inverting logic level converter installed? (Default False, if you don't know what it is just "
+        "enter no)")
     n_pixels = number_input("How many leds does your led strip have?")
-    status_led_pin = number_input("Where is your status led installed (enter if you dont have one)", True)
+    status_led_pin = number_input("Where is your status led installed (enter if you don't have one)", True)
     gesture_sensor_enabled = boolean_input("Do you have a grove gesture sensor installed?")
     add_service = boolean_input("Do you want to start the visualizer at startup?")
 
@@ -84,21 +90,23 @@ def setup_config():
 
     print("================== Config saved ==========================")
 
+
 def boolean_input(question: str):
     out = None
     while out == None:
         print(question + " (yes/no)")
         out_str = input(" >> ").lower()
 
-        if out_str in [ "y", "yes"]:
+        if out_str in ["y", "yes"]:
             out = True
-        elif out_str in [ "n", "no"]:
+        elif out_str in ["n", "no"]:
             out = False
         else:
             print("Invalid input can either be yes or no")
     return out
 
-def number_input(question: str, optional = False, default=None):
+
+def number_input(question: str, optional=False, default=None):
     out = default
     while True:
         print(question)
@@ -112,6 +120,7 @@ def number_input(question: str, optional = False, default=None):
         else:
             print("Input has to be a number and can not have decimal points")
     return out
+
 
 def install_dependencies():
     print("================== Start Installing PIP ==================")

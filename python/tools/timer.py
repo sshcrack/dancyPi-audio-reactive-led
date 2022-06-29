@@ -1,12 +1,14 @@
 from time import time
 
 
-_time_prev = time()
+class Timer:
+    def __init__(self):
+        self.prevTime = time()
+        self.currTime = time()
 
-def getPrevTime():
-    global _time_prev
-    return _time_prev
+    def update(self):
+        self.prevTime = self.currTime
+        self.currTime = time()
 
-def setPrevTime():
-    global _time_prev
-    _time_prev = time()
+    def getDelta(self):
+        return self.currTime - self.prevTime

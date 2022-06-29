@@ -1,8 +1,20 @@
-from time import time
-from typing import Optional, TypeVar
+from typing import  TypeVar
 import re
+import time
 
-from tools.timer import getPrevTime
+
+def timeit(func):
+    """
+    Decorator for measuring function's running time.
+    """
+    def measure_time(*args, **kw):
+        start_time = time.time()
+        result = func(*args, **kw)
+        print("Processing time of %s(): %.2f seconds."
+              % (func.__qualname__, time.time() - start_time))
+        return result
+
+    return measure_time
 
 
 def rgb_to_hex(r, g, b):
@@ -27,14 +39,6 @@ def wheel(pos):
     else:
         pos -= 170
         return [0, pos * 3, 255 - pos * 3]
-
-
-def getDeltaTime(curr_time: Optional[float] = None):
-    _time_prev = getPrevTime()
-    if curr_time is None:
-        curr_time = time()
-
-    return curr_time - _time_prev
 
 
 def check_int(potential_int: str):
