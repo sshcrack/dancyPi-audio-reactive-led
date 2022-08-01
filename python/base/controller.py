@@ -1,7 +1,3 @@
-from base.hardware.numpyThreads import prepareNumpy
-
-prepareNumpy()
-
 import sys
 import threading
 import traceback
