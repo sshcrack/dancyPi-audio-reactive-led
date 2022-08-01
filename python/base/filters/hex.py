@@ -32,9 +32,10 @@ class HexFilter(GeneralFilter):
         gradient = self.config.get("hex_gradient")
 
         gradient_pixels = calculateGradient(len(r), gradient)
-        avg = np.average(data, axis=0) / 255
+        avg = np.average(data, axis=0)
 
-        return np.array([avg * gradient_pixels[0], avg * gradient_pixels[1],  avg * gradient_pixels[2]])
+        hexRgb = np.array([avg * gradient_pixels[0], avg * gradient_pixels[1], avg * gradient_pixels[2]])
+        return np.clip(hexRgb.astype(int), 0, 255)
 
 
 def validateGradient(param: List[str]):
