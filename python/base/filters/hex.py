@@ -28,20 +28,13 @@ class HexFilter(GeneralFilter):
         }, controller)
 
     def run(self, data):
-        r, g, b = data
+        r = data[0]
         gradient = self.config.get("hex_gradient")
 
         gradient_pixels = calculateGradient(len(r), gradient)
+        avg = np.average(data, axis=0) / 255
 
-        for i in range(len(r)):
-            maxVal = np.max(np.array([r[i], g[i], b[i]]))
-            d_r, d_g, d_b = np.array(gradient_pixels[i])
-
-            r[i] = maxVal * d_r
-            g[i] = maxVal * d_g
-            b[i] = maxVal * d_b
-
-        return np.array([r, g, b])
+        return np.array([avg * gradient_pixels[0], avg * gradient_pixels[1],  avg * gradient_pixels[2]])
 
 
 def validateGradient(param: List[str]):
