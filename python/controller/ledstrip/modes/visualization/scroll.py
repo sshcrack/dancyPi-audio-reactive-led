@@ -32,7 +32,6 @@ class ScrollVisualizerMode(VisualizerMode):
     def run(self, mel):
         skip = self.config.get("scroll_skip", 0)
 
-        print(f"Skip is {skip}")
         if skip > 0:
             leftOver = self.i % skip
             print(f"Left over {leftOver}")
