@@ -6,6 +6,7 @@ import EnergyComp from './components/Energy'
 import GeneralComp from './components/GeneralComp'
 import { AvailableData, General, NormalStorageKeys, StoredData, Var } from './components/interface'
 import { capitalizeWord, getBaseUrl } from './components/tools'
+import FloatComponent from './components/types/FloatComponent'
 
 function Device({ deviceId }: { deviceId: string }) {
   const [available, setAvailable] = useState<AvailableData | undefined>(undefined)
@@ -83,6 +84,20 @@ function Device({ deviceId }: { deviceId: string }) {
 
   const content = <>
     <Heading>Effect</Heading>
+    <Box mt='1em' />
+    <Flex
+      className='generalBox'
+      justifyContent='center'
+      alignItems='center'
+      flexDir='row'
+    >
+      <Text w='50%'>Brightness</Text>
+      {stored ? <FloatComponent
+        curr={stored.brightness}
+        onChange={e => { onStoreChange({ ...stored, brightness: e }) }}
+        variable={{ name: "brightness", type: "float", min: 0, max: 100 }}
+      /> : <Spinner />}
+    </Flex>
     <Box mt='1em' />
     <Flex className='generalBox' justifyContent='center' alignItems='center' flexDir='column'>
       {modeSelector}
@@ -270,7 +285,8 @@ async function saveOuter(available: AvailableData | undefined, stored: StoredDat
   const proms = [
     fetch(`${base}/setmode?mode=${strMode}&${modeQuery}&device_id=${deviceId}`),
     fetch(`${base}/filter?mode=${strFilter}&${filterQuery}&device_id=${deviceId}`),
-    fetch(`${base}/energy?${energyQuery}&device_id=${deviceId}`)
+    fetch(`${base}/energy?${energyQuery}&device_id=${deviceId}`),
+    fetch(`${base}/brightness?brightness=${stored.brightness}&device_id=${deviceId}`)
   ]
 
   const onError = (e: unknown) => {

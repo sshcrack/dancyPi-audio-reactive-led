@@ -33,6 +33,7 @@ export interface NormalStorageKeys {
     locked: boolean;
     filter_mode: string;
     speed: number;
+    brightness: number;
     multiplier: number;
     energy_brightness: boolean;
     energy_brightness_mult: number;

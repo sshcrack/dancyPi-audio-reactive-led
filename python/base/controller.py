@@ -58,7 +58,8 @@ class GeneralController:
         self.logger = getLogger("GeneralController", deviceId)
         self.device = loadDeviceConfig(deviceId)
         self.config = ConfigManager(deviceId, configDefaults)
-        self.enabled = self.config.get("enabled")
+        self.enabled = self.config.get("enabled", True)
+        self.brightness = self.config.get("brightness", 100)
 
         self.energySense = clamp(0.0001, self.config.get("energy_sensitivity", .99), .99)
         self.isEnergySpeed = self.config.get("energy_speed", False)
@@ -123,7 +124,8 @@ class GeneralController:
             self.api.shutdown()
 
     def updateVars(self):
-        self.enabled = self.config.get("enabled")
+        self.brightness = self.config.get("brightness", 100)
+        self.enabled = self.config.get("enabled", True)
         self.energySense = self.config.get("energy_sensitivity", .99)
         self.isEnergySpeed = self.config.get("energy_speed", False)
         self.isEnergyBrightness = self.config.get("energy_brightness", False)
@@ -179,7 +181,7 @@ class GeneralController:
         else:
             self.pixels = p
         if self.led is not None:
-            self.led.update(p, force)
+            self.led.update(p * self.brightness / 100, force)
 
     def applyEnableAnimation(self, outPixels: np.ndarray):
         delta = self.timer.getDelta()

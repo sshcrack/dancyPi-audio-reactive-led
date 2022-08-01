@@ -2,6 +2,7 @@ import json
 import sys
 from http.server import BaseHTTPRequestHandler
 
+from httpserver.api.routes.brightness import onBrightness
 from httpserver.base import ThreadedHTTPServer
 from tools.interfaces import getIPs
 from threading import Thread
@@ -29,7 +30,8 @@ AVAILABLE_ROUTES = [
     "multiplier",
     "energy",
     "vars",
-    "available"
+    "available",
+    "brightness"
 ]
 
 
@@ -77,6 +79,9 @@ class APIServerHandler(BaseHTTPRequestHandler):
 
         if self.path.startswith("/available"):
             status, res = onAvailable(c, params)
+
+        if self.path.startswith("/brightness"):
+            status, res = onBrightness(c, params)
 
         self.send_response(status)
         self._set_headers()
