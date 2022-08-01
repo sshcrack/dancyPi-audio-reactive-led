@@ -1,3 +1,7 @@
+from base.hardware.numpyThreads import prepareNumpy
+prepareNumpy()
+
+
 import sys
 import threading
 import time
@@ -107,7 +111,6 @@ for relativeDevPath in devicesFiles:
     thread = Thread(target=lambda: runController(c, deviceId), name=f"CONTROLLER-{deviceId}")
     threads.append(thread)
     thread.start()
-
 
 gui = GUIManager(controllers) if isGui else None
 measureThread = Thread(target=measureMicThread, name="MEASURE_MIC")
