@@ -13,7 +13,7 @@ if TYPE_CHECKING:
 class EnergyVisualizerMode(VisualizerMode):
     def __init__(self, controller: "GeneralController"):
         super().__init__({
-            "mirror": True
+            "energy_mirror": True
         }, {
             "visualizer": True,
             "filters": True,
