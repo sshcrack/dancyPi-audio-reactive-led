@@ -8,6 +8,7 @@ const linearMatcher = /linear-gradient\(90deg,(\s*(#[0-9a-fA-F]{6}\s*\d{1,3}\.*\
 const defaultGrad = "linear-gradient(90deg, #ffffff 0.00%, #ff0000 100.00%);"
 
 export default function GradientComponent({ curr, onChange}: VarProps<GradientInitial, GradientOut>) {
+    curr = curr ?? [ "#ffffff"]
     const onCompChange = (e: string) => {
         const matches = e.match(linearMatcher)?.length !== 0
         if(!matches)
@@ -105,7 +106,7 @@ function initialToOut(checkable: GradientInitial | GradientOut) {
 }
 
 function checkGradOut(curr: GradientInitial | GradientOut): boolean {
-    if(curr.length === 0)
+    if(!curr || curr.length === 0)
         return false
 
     return typeof curr[0][1] === "string"

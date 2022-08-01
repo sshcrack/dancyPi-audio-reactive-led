@@ -2,7 +2,7 @@ export function capitalizeWord(str: string) {
     const split = str.split("")
     const first = split.shift()?.toUpperCase() ?? ""
 
-    return [ first, ...split ].join("")
+    return [first, ...split].join("")
 }
 
 export function rgbToHex(red: number, green: number, blue: number) {
@@ -22,5 +22,5 @@ export function hexToRgb(hex: string) {
 
 export function getBaseUrl(location: Location) {
     const { protocol, host } = location
-    return `${protocol}//${host/*"10.6.0.1:6789"*/}`
-  }
+    return `${protocol}//${host}`
+}
