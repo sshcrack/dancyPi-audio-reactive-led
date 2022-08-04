@@ -1,20 +1,15 @@
 import numpy as np
-import tools.tools as tools
 from base.GeneralMode import GeneralMode
 from tools.validators import validate_float
 from typing import TYPE_CHECKING
+import json
 
 if TYPE_CHECKING:
     from base.controller import GeneralController
 
-
-def getMax(arr):
-    maxVal = arr[0]
-    for x in arr:
-        if x > maxVal:
-            maxVal = x
-
-    return maxVal
+f = open("base/filters/rainbow.json", "r")
+rainbow = np.array(json.loads(f.read()))
+f.close()
 
 
 class RainbowMode(GeneralMode):
@@ -40,18 +35,22 @@ class RainbowMode(GeneralMode):
             speed = self.config.getGeneralSpeed()
 
         deltaTime = self.timer.getDelta()
+        avg = np.average(data, axis=0)
 
-        for i in range(len(r)):
-            maxVal = np.amax(data[:, i])
-            self.rgb_index += deltaTime * speed
-            local_led_index = int(self.rgb_index + i)
-            values = np.array(tools.wheel(local_led_index)) / 255
+        length = len(r)
 
-            if self.rgb_index >= 255:
-                self.rgb_index = 0
+        rgbIndices = np.full(length, deltaTime * speed)
+        multiplyArr = np.arange(1, length + 1).astype(float)
 
-            r[i] = values[0] * maxVal
-            g[i] = values[1] * maxVal
-            b[i] = values[2] * maxVal
+        rgbIndices = np.multiply(rgbIndices, multiplyArr) + self.rgb_index
+        self.rgb_index = rgbIndices[-1] % 255
+        rgbIndices = np.add(rgbIndices, multiplyArr - 1)
 
+        rgbIndices = rgbIndices.astype(int)
+        rgbIndices = np.remainder(rgbIndices, 255)
+        rgbIndices = rainbow.take(rgbIndices, axis=0)
+
+        r = rgbIndices[:, 0] * avg / 255
+        g = rgbIndices[:, 1] * avg / 255
+        b = rgbIndices[:, 2] * avg / 255
         return np.array([r, g, b])
